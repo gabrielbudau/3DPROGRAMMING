@@ -3,6 +3,8 @@
 #include <glew.h>
 #include <freeglut.h>
 #include <iostream>
+#include <fstream>
+
 using namespace std;
 
 extern const char* vertexShaderCode;
@@ -15,6 +17,14 @@ protected:
 	void initGL();
 	void sendDataToOpenGL();
 	void installShaders();
+	bool checkShaderStatus(GLuint shaderID);
+	bool checkProgramStatus(GLuint programID);
+	bool checkStatus(GLuint objectID,
+		PFNGLGETSHADERIVPROC objectPropertyGetter,
+		PFNGLGETSHADERINFOLOGPROC getInfoLogFunc,
+		GLenum statusType
+		);
+	string readVertexShaderCode(const char* fileName);
 public:
 	GLWindow(int argc, char** argv);
 	~GLWindow();

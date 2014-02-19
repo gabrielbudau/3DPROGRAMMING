@@ -28,26 +28,83 @@ void GLWindow::sendDataToOpenGL()
 
 }
 
+bool GLWindow::checkStatus(GLuint objectID, PFNGLGETSHADERIVPROC objectPropertyGetter, PFNGLGETSHADERINFOLOGPROC getInfoLogFunc, GLenum statusType)
+{
+	GLint status;
+	glGetShaderiv(objectID, statusType, &status);
+	if (status != GL_TRUE)
+	{
+		GLint infoLogLength;
+		objectPropertyGetter(objectID, GL_INFO_LOG_LENGTH, &infoLogLength);
+		GLchar* buffer = new GLchar[infoLogLength];
+		GLsizei bufferSize;
+		getInfoLogFunc(objectID, infoLogLength, &bufferSize, buffer);
+		cout << endl << buffer << endl;
+		delete[] buffer;
+		return false;
+	}
+	return true;
+}
+
+bool GLWindow::checkShaderStatus(GLuint shaderID)
+{
+	return checkStatus(shaderID, glGetShaderiv, glGetShaderInfoLog, GL_COMPILE_STATUS);
+}
+
+bool GLWindow::checkProgramStatus(GLuint programID)
+{
+	return checkStatus(programID, glGetProgramiv, glGetProgramInfoLog, GL_LINK_STATUS);
+}
+
+string GLWindow::readVertexShaderCode(const char* fileName)
+{
+	ifstream input(fileName);
+	if (!input)
+	{
+		cout << "File failed to load... " << fileName << endl;
+		exit(1);
+	}
+	return std::string(
+		std::istreambuf_iterator<char>(input),
+		std::istreambuf_iterator<char>());
+}
+
 void GLWindow::installShaders()
 {
+	//create shaders
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	const char* adapter[1]; 
-	adapter[0] = vertexShaderCode;
+	//insert shader into compiler
+	const GLchar* adapter[1];
+	//string temp = readVertexShaderCode("VertexShaderCode.glsl");
+	//cout << endl << temp.c_str();
+	adapter[0] = vertexShaderCode;// temp.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
-	adapter[0] = fragmentShaderCode;
+	//temp = readVertexShaderCode("FragmentShaderCode.glsl");
+	adapter[0] = fragmentShaderCode;//temp.c_str();
 	glShaderSource(fragmentShaderID, 1, adapter, 0);
-
+	//compile shaders
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
-
+	//get compile errors
+	if (!checkShaderStatus(vertexShaderID) || !checkShaderStatus(fragmentShaderID))
+	{
+		cout << endl << "\nshit\n";
+		return;
+	}
+	
+	//atach shaders
 	GLuint programID = glCreateProgram();
 	glAttachShader(programID, vertexShaderID);
 	glAttachShader(programID, fragmentShaderID);
-
+	//link program
 	glLinkProgram(programID);
-
+	//check link errors
+	if (!checkProgramStatus(programID))
+	{
+		cout << endl << "\ndouble shit\n";
+		return;
+	}
 	glUseProgram(programID);
 }
 
@@ -64,14 +121,12 @@ GLWindow::GLWindow(int argc, char** argv)
 	glutMainLoop();
 }
 
-
 GLWindow::~GLWindow()
 {
 }
 
 void GLWindow::initGL()
 {
-
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	gluOrtho2D(-1, 1, -1, 1);
@@ -79,14 +134,10 @@ void GLWindow::initGL()
 	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
 	installShaders();
 	sendDataToOpenGL();
-	
-	
-
 }
 
 void paintGL(void)
 {
-
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 	glFlush();
