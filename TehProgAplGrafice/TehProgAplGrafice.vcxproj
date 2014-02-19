@@ -70,7 +70,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GLWindow.cpp" />
-    <ClCompile Include="maincpp.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShaderCode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLWindow.h" />
