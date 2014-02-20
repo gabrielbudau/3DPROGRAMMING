@@ -1,14 +1,16 @@
 #include <GLWindow.h>
 GLuint programID;
+GLuint numIndices;
+
 
 void GLWindow::sendDataToOpenGL()
 {
-	ShapeData tri = ShapeGenerator::makeTriangle();
-	
+	//ShapeData tri = ShapeGenerator::makeTriangle();
+	ShapeData cube = ShapeGenerator::makeCube();
 	GLuint vertexBufferID;
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, tri.vertexBufferSize(), tri.vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube.vertexBufferSize(), cube.vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)* 6, 0);
 	glEnableVertexAttribArray(1);
@@ -17,8 +19,9 @@ void GLWindow::sendDataToOpenGL()
 	GLuint indexBufferID;
 	glGenBuffers(1, &indexBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, tri.indexBufferSize(), tri.indices, GL_STATIC_DRAW);
-	tri.cleanUp();
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.indexBufferSize(), cube.indices, GL_STATIC_DRAW);
+	numIndices = cube.numIndices;
+	cube.cleanUp();
 }
 
 bool GLWindow::checkStatus(GLuint objectID, PFNGLGETSHADERIVPROC objectPropertyGetter, PFNGLGETSHADERINFOLOGPROC getInfoLogFunc, GLenum statusType)
@@ -81,7 +84,6 @@ void GLWindow::installShaders()
 	//get compile errors
 	if (!checkShaderStatus(vertexShaderID) || !checkShaderStatus(fragmentShaderID))
 	{
-		cout << endl << "\nshit\n";
 		return;
 	}
 	
@@ -94,7 +96,6 @@ void GLWindow::installShaders()
 	//check link errors
 	if (!checkProgramStatus(programID))
 	{
-		cout << endl << "\ndouble shit\n";
 		return;
 	}
 	glUseProgram(programID);
@@ -106,7 +107,7 @@ GLWindow::GLWindow(int argc, char** argv)
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowPosition(800, 50);
 	glutInitWindowSize(400, 400);
-	glutCreateWindow("Poligoane");
+	glutCreateWindow("OPENGL");
 	initGL();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutDisplayFunc(paintGL);
@@ -136,20 +137,13 @@ void paintGL(void)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
-	GLint dominatingColorUniformLocation = glGetUniformLocation(programID, "dominatingColor");
-	GLint yFlipUniforlocation = glGetUniformLocation(programID, "yFlip");
-	vec3 dominatingColor(0.0f, 1.0f, 0.0f);
+	mat4 projectionMatrix = perspective(60.0f, ((GLfloat) WINDOW_WIDTH/WINDOW_HEIGHT), 0.1f, 10.0f);
+	mat4 projectionTranslationMatrix = translate(projectionMatrix, vec3(0.0f, 0.0f, -3.0f));
+	mat4 fullTransformMatrix = rotate(projectionTranslationMatrix, 54.0f, vec3(1.0f, 0.0f, 0.0f));
 
-	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	glUniform1f(yFlipUniforlocation, 1.0f);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(programID, "fullTransformMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 
-	dominatingColor.r = 0.0f;
-	dominatingColor.g = 0.0f;
-	dominatingColor.b = 1.0f;
-
-	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	glUniform1f(yFlipUniforlocation, -1.0f);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 	glFlush();
 }
