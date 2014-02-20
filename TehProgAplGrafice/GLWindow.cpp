@@ -1,5 +1,5 @@
 #include <GLWindow.h>
-
+GLuint programID;
 
 void GLWindow::sendDataToOpenGL()
 {
@@ -86,7 +86,7 @@ void GLWindow::installShaders()
 	}
 	
 	//atach shaders
-	GLuint programID = glCreateProgram();
+	programID = glCreateProgram();
 	glAttachShader(programID, vertexShaderID);
 	glAttachShader(programID, fragmentShaderID);
 	//link program
@@ -134,7 +134,22 @@ void GLWindow::initGL()
 void paintGL(void)
 {
 	glClear(GL_DEPTH_BUFFER_BIT);
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	
+	GLint dominatingColorUniformLocation = glGetUniformLocation(programID, "dominatingColor");
+	GLint yFlipUniforlocation = glGetUniformLocation(programID, "yFlip");
+	vec3 dominatingColor(0.0f, 1.0f, 0.0f);
+
+	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	glUniform1f(yFlipUniforlocation, 1.0f);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+
+	dominatingColor.r = 0.0f;
+	dominatingColor.g = 0.0f;
+	dominatingColor.b = 1.0f;
+
+	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	glUniform1f(yFlipUniforlocation, -1.0f);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 	glFlush();
 }

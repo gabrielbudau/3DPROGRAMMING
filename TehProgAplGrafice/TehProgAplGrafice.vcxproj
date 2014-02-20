@@ -71,7 +71,6 @@
   <ItemGroup>
     <ClCompile Include="GLWindow.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ShaderCode.cpp" />
     <ClCompile Include="ShapeGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>

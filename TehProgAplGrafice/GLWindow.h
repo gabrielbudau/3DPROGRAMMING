@@ -8,15 +8,14 @@
 #include <Vertex.h>
 #include <ShapeGenerator.h>
 
+#define WINDOW_WIDTH 400
+#define WINDOW_HEIGHT 400
+
 using namespace std;
 using namespace glm;
 
-extern const char* vertexShaderCode;
-extern const char* fragmentShaderCode;
+
 void paintGL(void);
-
-
-
 
 class GLWindow
 {
@@ -33,6 +32,7 @@ protected:
 		);
 	string readVertexShaderCode(const char* fileName);
 public:
+	
 	GLWindow(int argc, char** argv);
 	~GLWindow();
 	
