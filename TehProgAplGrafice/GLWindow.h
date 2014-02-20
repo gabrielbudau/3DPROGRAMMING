@@ -4,12 +4,19 @@
 #include <freeglut.h>
 #include <iostream>
 #include <fstream>
+#include <glm.hpp>
+#include <Vertex.h>
+#include <ShapeGenerator.h>
 
 using namespace std;
+using namespace glm;
 
 extern const char* vertexShaderCode;
 extern const char* fragmentShaderCode;
 void paintGL(void);
+
+
+
 
 class GLWindow
 {

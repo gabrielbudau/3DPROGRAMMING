@@ -1,37 +1,30 @@
 #include <GLWindow.h>
 
+
 void GLWindow::sendDataToOpenGL()
 {
-	GLfloat verts[] =
-	{
-		+0.0f, +1.0f,
-		+1.0f, +0.0f, +0.0f,
-		-1.0f, -1.0f,
-		+0.0f, +1.0f, +0.0f,
-		+1.0f, -1.0f,
-		+0.0f, +0.0f, +1.0f,
-	};
+	ShapeData tri = ShapeGenerator::makeTriangle();
+	
 	GLuint vertexBufferID;
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tri.vertexBufferSize(), tri.vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)* 5, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)* 6, 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)* 5, (char*)(sizeof(GLfloat)* 2));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)* 6, (char*)(sizeof(GLfloat)* 3));
 
-	GLushort indices[] = { 0, 1, 2};
 	GLuint indexBufferID;
 	glGenBuffers(1, &indexBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, tri.indexBufferSize(), tri.indices, GL_STATIC_DRAW);
+	tri.cleanUp();
 }
 
 bool GLWindow::checkStatus(GLuint objectID, PFNGLGETSHADERIVPROC objectPropertyGetter, PFNGLGETSHADERINFOLOGPROC getInfoLogFunc, GLenum statusType)
 {
 	GLint status;
-	glGetShaderiv(objectID, statusType, &status);
+	objectPropertyGetter(objectID, statusType, &status);
 	if (status != GL_TRUE)
 	{
 		GLint infoLogLength;
@@ -76,12 +69,11 @@ void GLWindow::installShaders()
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	//insert shader into compiler
 	const GLchar* adapter[1];
-	//string temp = readVertexShaderCode("VertexShaderCode.glsl");
-	//cout << endl << temp.c_str();
-	adapter[0] = vertexShaderCode;// temp.c_str();
+	string temp = readVertexShaderCode("VertexShaderCode.glsl");
+	adapter[0] =  temp.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
-	//temp = readVertexShaderCode("FragmentShaderCode.glsl");
-	adapter[0] = fragmentShaderCode;//temp.c_str();
+	temp = readVertexShaderCode("FragmentShaderCode.glsl");
+	adapter[0] = temp.c_str();
 	glShaderSource(fragmentShaderID, 1, adapter, 0);
 	//compile shaders
 	glCompileShader(vertexShaderID);
@@ -112,7 +104,7 @@ GLWindow::GLWindow(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowPosition(100, 100);
+	glutInitWindowPosition(800, 50);
 	glutInitWindowSize(400, 400);
 	glutCreateWindow("Poligoane");
 	initGL();
@@ -131,13 +123,17 @@ void GLWindow::initGL()
 	glMatrixMode(GL_PROJECTION);
 	gluOrtho2D(-1, 1, -1, 1);
 	glewInit();
+
+	glEnable(GL_DEPTH_TEST);
 	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
-	installShaders();
+	
 	sendDataToOpenGL();
+	installShaders();
 }
 
 void paintGL(void)
 {
+	glClear(GL_DEPTH_BUFFER_BIT);
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 	glFlush();
