@@ -17,7 +17,7 @@ using namespace glm;
 
 
 void paintGL(void);
-
+void reshape(int w, int h);
 
 class GLWindow
 {

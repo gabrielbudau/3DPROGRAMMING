@@ -111,6 +111,7 @@ GLWindow::GLWindow(int argc, char** argv)
 	initGL();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutDisplayFunc(paintGL);
+	glutReshapeFunc(reshape);
 	glutMainLoop();
 }
 
@@ -146,4 +147,30 @@ void paintGL(void)
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 	glFlush();
+	glutPostRedisplay();
+}
+
+void reshape(int w, int h) {
+
+	// Prevent a divide by zero, when window is too short
+	// (you cant make a window of zero width).
+	if (h == 0)
+		h = 1;
+	float ratio = 1.0* w / h;
+
+	// Use the Projection Matrix
+	glMatrixMode(GL_PROJECTION);
+
+	// Reset Matrix
+	glLoadIdentity();
+
+	// Set the viewport to be the entire window
+	glViewport(0, 0, w, h);
+
+	// Set the correct perspective.
+	gluPerspective(60, ratio, 1, 1000);
+
+	// Get Back to the Modelview
+	glMatrixMode(GL_MODELVIEW);
+	
 }
