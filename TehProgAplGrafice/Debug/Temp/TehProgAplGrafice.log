@@ -1,9 +1,8 @@
-﻿Build started 2/20/2014 9:31:46 PM.
+﻿Build started 2/22/2014 2:23:25 PM.
      1>Project "C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\TehProgAplGrafice.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\freeglut\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\ /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glew\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glm /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\Temp\\" /Fd"Debug\Temp\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt GLWindow.cpp
          GLWindow.cpp
-     1>c:\users\gabriel\desktop\gl\tehprogaplgrafice\glwindow.cpp(159): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
          GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
          GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
        Link:
@@ -15,4 +14,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.16
+Time Elapsed 00:00:01.35

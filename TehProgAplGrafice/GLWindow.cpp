@@ -98,6 +98,11 @@ void GLWindow::installShaders()
 	{
 		return;
 	}
+
+	//delete shaders
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragmentShaderID);
+
 	glUseProgram(programID);
 }
 
@@ -111,12 +116,13 @@ GLWindow::GLWindow(int argc, char** argv)
 	initGL();
 	glClear(GL_COLOR_BUFFER_BIT);
 	glutDisplayFunc(paintGL);
-	glutReshapeFunc(reshape);
 	glutMainLoop();
 }
 
 GLWindow::~GLWindow()
 {
+	glUseProgram(0);
+	glDeleteProgram(programID);
 }
 
 void GLWindow::initGL()
@@ -138,39 +144,26 @@ void paintGL(void)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
-	mat4 projectionMatrix = perspective(60.0f, ((GLfloat) WINDOW_WIDTH/WINDOW_HEIGHT), 0.1f, 10.0f);
-	mat4 projectionTranslationMatrix = translate(projectionMatrix, vec3(0.0f, 0.0f, -3.0f));
-	mat4 fullTransformMatrix = rotate(projectionTranslationMatrix, 54.0f, vec3(1.0f, 0.0f, 0.0f));
-
 	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(programID, "fullTransformMatrix");
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	mat4 fullTransformMatrix;
+	mat4 projectionMatrix = perspective(60.0f, ((GLfloat) WINDOW_WIDTH/WINDOW_HEIGHT), 0.1f, 10.0f);
 
+	//Cube 1:
+	mat4 translationMatrix = translate( vec3(1.0f, 0.0f, -3.75f));
+	mat4 rotationMatrix = rotate(126.0f, vec3(1.0f, 0.0f, 0.0f));
+	fullTransformMatrix = projectionMatrix * translationMatrix * rotationMatrix;
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	//Cube 2:
+	translationMatrix = translate(vec3(-1.0f, 0.0f, -3.0f));
+	rotationMatrix = rotate(36.0f, vec3(0.0f, 1.0f, 0.0f));
+	fullTransformMatrix = projectionMatrix * translationMatrix * rotationMatrix;
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+
+
+
 	glFlush();
 	glutPostRedisplay();
 }
 
-void reshape(int w, int h) {
-
-	// Prevent a divide by zero, when window is too short
-	// (you cant make a window of zero width).
-	if (h == 0)
-		h = 1;
-	float ratio = 1.0* w / h;
-
-	// Use the Projection Matrix
-	glMatrixMode(GL_PROJECTION);
-
-	// Reset Matrix
-	glLoadIdentity();
-
-	// Set the viewport to be the entire window
-	glViewport(0, 0, w, h);
-
-	// Set the correct perspective.
-	gluPerspective(60, ratio, 1, 1000);
-
-	// Get Back to the Modelview
-	glMatrixMode(GL_MODELVIEW);
-	
-}

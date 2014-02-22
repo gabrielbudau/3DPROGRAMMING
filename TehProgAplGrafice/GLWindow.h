@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <glm.hpp>
+#include <gtx\transform.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <Vertex.h>
 #include <ShapeGenerator.h>
@@ -14,6 +15,7 @@
 
 using namespace std;
 using namespace glm;
+
 
 
 void paintGL(void);
