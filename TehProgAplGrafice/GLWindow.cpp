@@ -1,11 +1,13 @@
 #include <GLWindow.h>
 GLuint programID;
 GLuint numIndices;
-
+Camera camera;
+GLuint width = WINDOW_WIDTH, height = WINDOW_HEIGHT;
+bool* keyStates = new bool[256];
+bool* keySpecialStates = new bool[256];
 
 void GLWindow::sendDataToOpenGL()
 {
-	//ShapeData tri = ShapeGenerator::makeTriangle();
 	ShapeData cube = ShapeGenerator::makeCube();
 	GLuint vertexBufferID;
 	glGenBuffers(1, &vertexBufferID);
@@ -22,6 +24,25 @@ void GLWindow::sendDataToOpenGL()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.indexBufferSize(), cube.indices, GL_STATIC_DRAW);
 	numIndices = cube.numIndices;
 	cube.cleanUp();
+	
+	GLuint transformationMatrixBufferID;
+	glGenBuffers(1, &transformationMatrixBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, transformationMatrixBufferID);
+
+	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mat2) * 2, 0, GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(mat4), (void*)(sizeof(float) * 0));
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(mat4), (void*)(sizeof(float) * 4));
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(mat4), (void*)(sizeof(float) * 8));
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(mat4), (void*)(sizeof(float) * 12));
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
+	glEnableVertexAttribArray(5);
+	glVertexAttribDivisor(2, 1);
+	glVertexAttribDivisor(3, 1);
+	glVertexAttribDivisor(4, 1);
+	glVertexAttribDivisor(5, 1);
 }
 
 bool GLWindow::checkStatus(GLuint objectID, PFNGLGETSHADERIVPROC objectPropertyGetter, PFNGLGETSHADERINFOLOGPROC getInfoLogFunc, GLenum statusType)
@@ -106,16 +127,28 @@ void GLWindow::installShaders()
 	glUseProgram(programID);
 }
 
+
 GLWindow::GLWindow(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowPosition(800, 50);
-	glutInitWindowSize(400, 400);
+	glutInitWindowPosition(50, 50);
+	glutInitWindowSize(width, height);
 	glutCreateWindow("OPENGL");
 	initGL();
 	glClear(GL_COLOR_BUFFER_BIT);
+
 	glutDisplayFunc(paintGL);
+	glutMotionFunc(mouseActiveMotion);
+	glutPassiveMotionFunc(mousePasiveMotion);
+
+	glutKeyboardFunc(keyPressed);
+	glutKeyboardUpFunc(keyUp);
+
+	glutSpecialFunc(keySpecial);
+	glutSpecialUpFunc(keySpecialUp);
+	glutIdleFunc(paintGL);
+	glutReshapeFunc(reshape);
 	glutMainLoop();
 }
 
@@ -129,41 +162,123 @@ void GLWindow::initGL()
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
-	gluOrtho2D(-1, 1, -1, 1);
+	gluOrtho2D(-3, 3, -1, 1);
 	glewInit();
-
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 	glEnable(GL_DEPTH_TEST);
 	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
-	
+	initBoolArray(keyStates);
+	initBoolArray(keySpecialStates);
 	sendDataToOpenGL();
 	installShaders();
 }
 
 void paintGL(void)
 {
+	keyOperations();
+	//keySpecialOperations();
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	mat4 projectionMatrix = perspective(60.0f, ((GLfloat)width / height), 0.1f, 10.0f);
+
+	mat4 fullTransforms[] = {
+		projectionMatrix * camera.getWorldToViewMatrix() * translate(vec3(-1.0f, +0.0f, -3.75f))*rotate(126.0f, vec3(1.0f, 0.0f, 0.0f)),
+		projectionMatrix * camera.getWorldToViewMatrix() * translate(vec3(+1.0f, +0.0f, -3.75f))*rotate( 36.0f, vec3(0.0f, 1.0f, 0.0f))
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fullTransforms), fullTransforms, GL_DYNAMIC_DRAW);
+
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	//glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
-	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(programID, "fullTransformMatrix");
-	mat4 fullTransformMatrix;
-	mat4 projectionMatrix = perspective(60.0f, ((GLfloat) WINDOW_WIDTH/WINDOW_HEIGHT), 0.1f, 10.0f);
-
-	//Cube 1:
-	mat4 translationMatrix = translate( vec3(1.0f, 0.0f, -3.75f));
-	mat4 rotationMatrix = rotate(126.0f, vec3(1.0f, 0.0f, 0.0f));
-	fullTransformMatrix = projectionMatrix * translationMatrix * rotationMatrix;
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
-	//Cube 2:
-	translationMatrix = translate(vec3(-1.0f, 0.0f, -3.0f));
-	rotationMatrix = rotate(36.0f, vec3(0.0f, 1.0f, 0.0f));
-	fullTransformMatrix = projectionMatrix * translationMatrix * rotationMatrix;
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
-
-
+	glDrawElementsInstanced(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0, 2);
 
 	glFlush();
 	glutPostRedisplay();
 }
 
+void reshape(int w, int h)
+{
+	width = w;
+	height = h;
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+	glutPostRedisplay();
+}
+
+void mousePasiveMotion(int x, int y){
+	/*
+	camera.mouseUpdate(vec2(x, y));
+	glutPostRedisplay();
+	*/
+}
+
+void mouseActiveMotion(int x, int y){
+	camera.mouseUpdate(vec2(x, y));
+	glutPostRedisplay();
+}
+
+void keyPressed(unsigned char key, int x, int y)
+{
+	keyStates[key] = true;
+	glutPostRedisplay();
+}
+
+void keyUp(unsigned char key, int x, int y)
+{
+	keyStates[key] = false;
+	glutPostRedisplay();
+}
+
+void keyOperations(void)
+{
+	if (keyStates['w']){
+		camera.moveForward();
+	}
+	else if (keyStates['s']){
+		camera.moveBackward();
+	}
+	else if (keyStates['a']){
+		camera.strafeLeft();
+	}
+	else if (keyStates['d']){
+		camera.strafeRight();
+	}
+	else if (keyStates['r']){
+		camera.moveUp();
+	}
+	else if (keyStates['f']){
+		camera.moveDown();
+	}
+	
+}
+
+void keySpecial(int key, int x, int y) 
+{
+	keySpecialStates[key] = true;
+}
+
+void keySpecialUp(int key, int x, int y)
+{
+	keySpecialStates[key] = false;
+}
+
+void keySpecialOperations(void) {
+	if (keySpecialStates[GLUT_KEY_UP]){
+		camera.moveForward();
+	}
+	else if (keySpecialStates[GLUT_KEY_DOWN]){
+		camera.moveBackward();
+	}
+	else if (keySpecialStates[GLUT_KEY_LEFT]){
+		camera.strafeLeft();
+	}
+	else if (keySpecialStates[GLUT_KEY_RIGHT]){
+		camera.strafeRight();
+	}
+	
+}
+
+void initBoolArray(bool *ba)
+{
+	for (int i = 0; i < 256; i++)
+		ba[i] = false;
+}
