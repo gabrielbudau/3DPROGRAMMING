@@ -2,14 +2,14 @@
 
 in layout(location = 0) vec3 position;
 in layout(location = 1) vec3 vertexColor;
-in layout(location = 2) mat4 transformMatrix;
+//in layout(location = 2) mat4 transformMatrix;
 
 out vec3 theColor;
-
+uniform mat4 fulltransformMatrix;
 
 void main()
 {
 	vec4 v = vec4(position, 1.0);
-	gl_Position = transformMatrix * v;
+	gl_Position = fulltransformMatrix * v;
 	theColor = vertexColor;
 }
