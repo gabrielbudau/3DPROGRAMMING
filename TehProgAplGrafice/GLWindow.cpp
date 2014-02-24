@@ -16,7 +16,7 @@ GLuint cubeIndexDataByteOffset;
 
 void GLWindow::sendDataToOpenGL()
 {
-	ShapeData cube = ShapeGenerator::makePlane();
+	ShapeData cube = ShapeGenerator::makeTeapot(10);
 	ShapeData arrow = ShapeGenerator::makeArrow();
 
 
@@ -176,13 +176,14 @@ GLWindow::~GLWindow()
 
 void GLWindow::initGL()
 {
+	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	gluOrtho2D(-3, 3, -1, 1);
-	glewInit();
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 	glEnable(GL_DEPTH_TEST);
-	cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
+	glEnable(GL_CULL_FACE);
+	glewInit();
 	initBoolArray(keyStates);
 	initBoolArray(keySpecialStates);
 	sendDataToOpenGL();
@@ -203,12 +204,16 @@ void paintGL(void)
 	
 	//Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
-	mat4 cube1ModelToWorldMatrix = translate(vec3(-2.0f, +0.0f, -3.75f))*rotate(126.0f, vec3(1.0f, 0.0f, 0.0f));
+	mat4 cube1ModelToWorldMatrix = 
+		translate(vec3(-3.0f, +0.0f, -3.75f)) * 
+		rotate(-90.0f, vec3(1.0f, 0.0f, 0.0f)) * 
+		rotate(-90.0f, vec3(0.0f, 0.0f, 1.0f));
+
 	fullTransformMatrix = worldToProjectionMatrix * cube1ModelToWorldMatrix;
 	glUniformMatrix4fv(fullTransformUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexDataByteOffset);
 
-	mat4 cube2ModelToWorldMatrix = translate(vec3(+2.0f, +0.0f, -3.75f))*rotate(36.0f, vec3(0.0f, 1.0f, 0.0f));
+	mat4 cube2ModelToWorldMatrix = translate(vec3(+3.0f, +0.0f, -3.75f))*rotate(-90.0f, vec3(1.0f, 0.0f, 0.0f));
 	fullTransformMatrix = worldToProjectionMatrix * cube2ModelToWorldMatrix;
 	glUniformMatrix4fv(fullTransformUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexDataByteOffset);

@@ -1,14 +1,10 @@
-﻿Build started 2/24/2014 1:34:24 PM.
+﻿Build started 2/24/2014 2:04:17 PM.
      1>Project "C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\TehProgAplGrafice.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\freeglut\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\ /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glew\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glm /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\Temp\\" /Fd"Debug\Temp\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt GLWindow.cpp ShapeGenerator.cpp main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\freeglut\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\ /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glew\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glm /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\Temp\\" /Fd"Debug\Temp\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt GLWindow.cpp
          GLWindow.cpp
          GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
          GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
-         Generating Code...
-         Skipping... (no relevant changes detected)
-         main.cpp
-         ShapeGenerator.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\Debug\TehProgAplGrafice.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\freeglut\lib /LIBPATH:C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glew\lib\Release\Win32 glew32.lib glew32s.lib freeglut.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\Debug\TehProgAplGrafice.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\Debug\TehProgAplGrafice.lib" /MACHINE:X86 Debug\Temp\Camera.obj
          Debug\Temp\GLWindow.obj
@@ -19,4 +15,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.22
+Time Elapsed 00:00:01.17
