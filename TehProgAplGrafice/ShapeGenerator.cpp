@@ -2,18 +2,27 @@
 
 #define NUM_ARRAY_ELEMENTS(a) sizeof(a) / sizeof(*a)
 
+glm::vec3 randomColor()
+{
+	glm::vec3 ret;
+	ret.x = rand() / (float)RAND_MAX;
+	ret.y = rand() / (float)RAND_MAX;
+	ret.z = rand() / (float)RAND_MAX;
+	return ret;
+}
+
 ShapeData ShapeGenerator::makeTriangle()
 {
 	ShapeData ret;
 	Vertex verts[] =
 	{
-		glm::vec3(+0.0f, +1.0f, +0.0f), 
+		glm::vec3(+0.0f, +1.0f, +0.0f),
 		glm::vec3(+1.0f, +0.0f, +0.0f),
 
-		glm::vec3(-1.0f, -1.0f, +0.0f), 
+		glm::vec3(-1.0f, -1.0f, +0.0f),
 		glm::vec3(+0.0f, +1.0f, +0.0f),
 
-		glm::vec3(+1.0f, -1.0f, +0.0f), 
+		glm::vec3(+1.0f, -1.0f, +0.0f),
 		glm::vec3(+0.0f, +0.0f, +1.0f)
 	};
 
@@ -24,7 +33,7 @@ ShapeData ShapeGenerator::makeTriangle()
 	GLushort indices[] = { 0, 1, 2 };
 	ret.numIndices = NUM_ARRAY_ELEMENTS(indices);
 	ret.indices = new GLushort[ret.numIndices];
-	memcpy(ret.indices, indices,sizeof(indices));
+	memcpy(ret.indices, indices, sizeof(indices));
 	return ret;
 }
 
@@ -93,9 +102,9 @@ ShapeData ShapeGenerator::makeCube()
 	memcpy(ret.vertices, stackVerts, sizeof(stackVerts));
 
 	GLushort stackIndices[] = {
-		0,   1,  2,  0,  2,  3,// Top
-		4,   5,  6,  4,  6,  7,// Front
-		8,   9, 10,  8, 10, 11,// Right
+		0, 1, 2, 0, 2, 3,// Top
+		4, 5, 6, 4, 6, 7,// Front
+		8, 9, 10, 8, 10, 11,// Right
 		12, 13, 14, 12, 14, 15,// Left
 		16, 17, 18, 16, 18, 19,// Back
 		20, 22, 21, 20, 23, 22,// Bottom
@@ -275,3 +284,56 @@ ShapeData ShapeGenerator::makeArrow()
 	memcpy(ret.indices, stackIndices, sizeof(stackIndices));
 	return ret;
 }
+
+ShapeData ShapeGenerator::makePlaneVerts(GLuint dimensions)
+{
+	ShapeData ret;
+	ret.numVertices = dimensions * dimensions;
+	int half = dimensions / 2;
+	ret.vertices = new Vertex[ret.numVertices];
+	for (int i = 0; i < dimensions; i++)
+	{
+		for (int j = 0; j < dimensions; j++)
+		{
+			Vertex& thisVert = ret.vertices[i * dimensions + j];
+			thisVert.position.x = j - half;
+			thisVert.position.z = i - half;
+			thisVert.position.y = 0;
+			thisVert.color = randomColor();
+		}
+	}
+	return ret;
+}
+
+ShapeData ShapeGenerator::makePlaneIndices(GLuint dimensions)
+{
+	ShapeData ret;
+	ret.numIndices = (dimensions - 1) * (dimensions - 1) * 2 * 3; // 2 triangles per square, 3 indices per triangle
+	ret.indices = new unsigned short[ret.numIndices];
+	int runner = 0;
+	for (int row = 0; row < dimensions - 1; row++)
+	{
+		for (int col = 0; col < dimensions - 1; col++)
+		{
+			ret.indices[runner++] = dimensions * row + col;
+			ret.indices[runner++] = dimensions * row + col + dimensions;
+			ret.indices[runner++] = dimensions * row + col + dimensions + 1;
+
+			ret.indices[runner++] = dimensions * row + col;
+			ret.indices[runner++] = dimensions * row + col + dimensions + 1;
+			ret.indices[runner++] = dimensions * row + col + 1;
+		}
+	}
+	assert(runner = ret.numIndices);
+	return ret;
+}
+
+ShapeData ShapeGenerator::makePlane(GLuint dimensions)
+{
+	ShapeData ret = makePlaneVerts(dimensions);
+	ShapeData ret2 = makePlaneIndices(dimensions);
+	ret.numIndices = ret2.numIndices;
+	ret.indices = ret2.indices;
+	return ret;
+}
+

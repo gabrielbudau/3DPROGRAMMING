@@ -16,7 +16,7 @@ GLuint cubeIndexDataByteOffset;
 
 void GLWindow::sendDataToOpenGL()
 {
-	ShapeData cube = ShapeGenerator::makeCube();
+	ShapeData cube = ShapeGenerator::makePlane();
 	ShapeData arrow = ShapeGenerator::makeArrow();
 
 
@@ -169,6 +169,7 @@ GLWindow::GLWindow(int argc, char** argv)
 
 GLWindow::~GLWindow()
 {
+	glDeleteBuffers(1, &theBufferID);
 	glUseProgram(0);
 	glDeleteProgram(programID);
 }
@@ -196,7 +197,7 @@ void paintGL(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	mat4 fullTransformMatrix;
-	mat4 viewToProjectionMatrix = perspective(60.0f, ((GLfloat)width / height), 0.1f, 10.0f);
+	mat4 viewToProjectionMatrix = perspective(60.0f, ((GLfloat)width / height), 0.1f, 20.0f);
 	mat4 worldToViewMatrix = camera.getWorldToViewMatrix();
 	mat4 worldToProjectionMatrix = viewToProjectionMatrix * worldToViewMatrix;
 	
