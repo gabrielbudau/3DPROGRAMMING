@@ -20,7 +20,7 @@ public:
 	void strafeLeft();
 	void strafeRight();
 	glm::mat4 getWorldToViewMatrix() const;
-
-	
+	void setPosition(glm::vec3 _v);
+	void setViewDirection(glm::vec3 _v);
 };
 

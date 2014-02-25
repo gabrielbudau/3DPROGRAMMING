@@ -13,6 +13,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Cube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ShapeData.h">
@@ -31,6 +32,10 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="TeapotData.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="png.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

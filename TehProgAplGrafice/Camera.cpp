@@ -55,3 +55,11 @@ void Camera::strafeRight()
 {
 	position += movementSpeed * strafeDirection;
 }
+
+void Camera::setPosition(glm::vec3 _v){
+	position = _v;
+}
+
+void Camera::setViewDirection(glm::vec3 _v){
+	viewDirection = _v;
+}

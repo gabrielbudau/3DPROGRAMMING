@@ -10,7 +10,9 @@
 #include <Vertex.h>
 #include <ShapeGenerator.h>
 #include <Camera.h>
-
+#include <Cube.h>
+#include<zlib.h>
+#include<png.h>
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 400
 
