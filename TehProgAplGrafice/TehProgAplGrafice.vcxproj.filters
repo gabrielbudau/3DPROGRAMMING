@@ -1,64 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ShapeGenerator.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="GLWindow.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ShapeData.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="ShapeGenerator.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="GLWindow.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="TeapotData.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube.h" />
-    <ClInclude Include="png.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="FragmentShaderCode.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="VertexShaderCode.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Primitives">
-      <UniqueIdentifier>{a9f157d9-1589-4e0c-9b75-4eb5e4072e71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{3a3f2e83-7384-4dbe-bbbf-e93ab23f61a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{d83a6c7d-d855-4c0f-9bb8-4634064c0f5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sources">
-      <UniqueIdentifier>{bff4c998-c458-430b-9ce8-0f779058524b}</UniqueIdentifier>
-    </Filter>
+    <Text Include="puncte.txt" />
   </ItemGroup>
 </Project>

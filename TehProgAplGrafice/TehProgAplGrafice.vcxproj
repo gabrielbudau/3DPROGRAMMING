@@ -69,25 +69,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Cube.cpp" />
-    <ClCompile Include="GLWindow.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ShapeGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
-    <ClInclude Include="GLWindow.h" />
-    <ClInclude Include="png.h" />
-    <ClInclude Include="ShapeData.h" />
-    <ClInclude Include="ShapeGenerator.h" />
-    <ClInclude Include="TeapotData.h" />
-    <ClInclude Include="Vertex.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="FragmentShaderCode.glsl" />
-    <None Include="VertexShaderCode.glsl" />
+    <Text Include="puncte.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
