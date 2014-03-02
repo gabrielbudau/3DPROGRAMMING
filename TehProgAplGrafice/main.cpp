@@ -38,7 +38,7 @@ GLboolean activePts[MAX_POINTS];
 GLfloat colctrlpoints[MAX_POINTS][4] = {
 	{ 1.0, 1.0, 0.0, 1.0 }, { 0.9, 0.5, 0.0, 1.0 },
 	{ 0.2, 0.4, 0.3, 1.0 }, { 0.0, 0.0, 1.0, 1.0 } };
-GLfloat tolerance = 0.05;
+GLfloat tolerance = 0.1;
 
 GLvoid init(GLvoid);
 GLvoid display(GLvoid);
@@ -78,22 +78,25 @@ GLvoid init(GLvoid)
 		activePts[i] = false;
 	mouseBtn[0] = mouseBtn[1] = mouseBtn[2] = false;
 	glClearColor(1.0, 1.0, 1.0, 0.0);
+	/*
 	glShadeModel(GL_FLAT);
 	glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints[0][0]);
 	glMap1f(GL_MAP1_COLOR_4, 0.0, 1.0, 4, 4, &colctrlpoints[0][0]);
 	glEnable(GL_MAP1_VERTEX_3);
 	glEnable(GL_MAP1_COLOR_4);
+	*/
 }
 
 GLvoid display(GLvoid)
 {
-	mouseAction(mouseX, mouseY);
-	int i;
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(1.0, 0.0, 0.0);
-	
+	mouseAction(mouseX, mouseY);
 	drawGrid();
+	drawMousePoints();
 
+
+	int i;
 	glLineWidth(3.0);
 	glBegin(GL_LINE_STRIP);
 	for (i = 0; i <= 30; i++)
@@ -107,9 +110,6 @@ GLvoid display(GLvoid)
 		glVertex3fv(&ctrlpoints[i][0]);
 	// glColor3fv (&colctrlpoints[i][0]);
 	glEnd();
-
-	drawMousePoints();
-
 	glFlush();
 
 	glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlpoints[0][0]);
@@ -225,11 +225,13 @@ GLvoid mouseAction(GLint x, GLint y){
 	ratioY = 1.0 - ratioY;
 	GLfloat sceneWidth = abs(windowLeft) + abs(windowRight);
 	GLfloat sceneHeight = abs(windowTop) + abs(windowBottom);
-
+	
 	sceneX = (ratioX > 0.5) ? (sceneWidth * ratioX) - windowRight /*La dreapta de 0.0 pe axa X*/ : (sceneWidth * ratioX) + windowLeft;/*La stanga de 0.0 pe axa X*/
 	sceneY = (ratioY > 0.5) ? (sceneHeight * ratioY) + windowBottom /*Dedesupt de 0.0 pe axa Y*/ : (sceneHeight * ratioY) - windowTop;/*Deasupra de 0.0 pe axa Y*/
 	P.push_back(point(sceneX, sceneY, 0.0));
 	PColor.push_back(point((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX));
+	
+	
 	if (mouseBtn[GLUT_LEFT_BUTTON])
 	{
 		for (int i = 0; i < MAX_POINTS; i++)
@@ -239,22 +241,36 @@ GLvoid mouseAction(GLint x, GLint y){
 				(sceneY < (ctrlpoints[i][1] + tolerance)) &&
 				(sceneY >(ctrlpoints[i][1] - tolerance)))
 				activePts[i] = true;
-				//ctrlpoints[i][0] = sceneX;
-				//ctrlpoints[i][1] = sceneY;
 		}
 
 	}
-	else{
+	
+	for (int i = 0; i < MAX_POINTS; i++)
+	{
+		if (activePts[i])
+		{
+			if (sceneX > (windowLeft - tolerance) && 
+				sceneX < (windowRight - tolerance) && 
+				sceneY < (windowTop - tolerance) && 
+				sceneY >(windowBottom - tolerance))
+			{
+				ctrlpoints[i][0] = sceneX;
+				ctrlpoints[i][1] = sceneY;
+			}
+		}
+	}
+
+	if (!mouseBtn[GLUT_LEFT_BUTTON]){
 		for (int i = 0; i < MAX_POINTS; i++)
 		{
 			if (activePts[i])
 			{
-				ctrlpoints[i][0] = sceneX;
-				ctrlpoints[i][1] = sceneY;
 				activePts[i] = false;
 			}
 		}
 	}
+	
+
 }
 
 GLvoid drawMousePoints()
