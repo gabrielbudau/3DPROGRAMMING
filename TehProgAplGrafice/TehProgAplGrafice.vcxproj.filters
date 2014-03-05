@@ -2,14 +2,18 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="utils.cpp" />
-    <ClCompile Include="V3.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="puncte.txt" />
+    <Filter Include="Headers">
+      <UniqueIdentifier>{8e35d5b8-04bd-489d-b15f-eb630c57cea9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{b3c92c9a-7630-4f6b-8da7-9d3d746895d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils.h" />
-    <ClInclude Include="V3.h" />
+    <ClInclude Include="Vector3.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
