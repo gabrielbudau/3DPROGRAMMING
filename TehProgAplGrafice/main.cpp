@@ -163,7 +163,7 @@ GLvoid display(GLvoid)
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < Tris.size(); i++){
 		//glColor3f(TrisColor.at(i).getX(), TrisColor.at(i).getY(), TrisColor.at(i).getZ());
-		glTexCoord2f(0.0, 0.0);
+		glTexCoord2f(0.5, 0.0);
 		glVertex2f(Tris.at(i).at(0).getX(), Tris.at(i).at(0).getY());
 		glTexCoord2f(0.0, 1.0);
 		glVertex2f(Tris.at(i).at(1).getX(), Tris.at(i).at(1).getY());
@@ -171,14 +171,14 @@ GLvoid display(GLvoid)
 		glVertex2f(Tris.at(i).at(2).getX(), Tris.at(i).at(2).getY());
 	}
 	glEnd();
-
+	glDisable(GL_TEXTURE_2D);
 	/*****************************************************************************/
 	/* AFISARE LINII
 	concav concav = blue
 	convex convex = red
 	concav convex = yellow */
 	glEnable(GL_LINE_SMOOTH);
-	glColor3dv(black);
+	//glColor3dv(black);
 	//glLineWidth(1.0);
 	glBegin(GL_LINE_STRIP);
 	for (unsigned int i = 0; i < Points.size(); i++){
@@ -272,7 +272,7 @@ GLvoid display(GLvoid)
 
 	glFlush();
 
-	glDisable(GL_TEXTURE_2D);
+	
 }
 
 GLvoid reshape(GLint w, GLint h)
