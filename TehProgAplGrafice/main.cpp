@@ -1,7 +1,7 @@
 #include <freeglut.h>
 #include <stdio.h>
 #include "Vector3.h"
-
+#include <SDL.h>
 #define GLUT_KEYS_ESCAPE		27
 
 const GLsizei windowWidth = 500;
