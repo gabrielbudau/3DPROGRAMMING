@@ -1,4 +1,4 @@
-﻿Build started 3/5/2014 11:36:08 PM.
+﻿Build started 3/6/2014 7:38:44 PM.
      1>Project "C:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\TehProgAplGrafice.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\freeglut\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\ /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glew\include\GL /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\glm /IC:\Users\Gabriel\Desktop\GL\TehProgAplGrafice\..\Libraries\zlib\include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\Temp\\" /Fd"Debug\Temp\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
@@ -10,4 +10,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.58
+Time Elapsed 00:00:00.51
