@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "Texture.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -9,7 +10,6 @@
 
 #include <glew.h>
 #include <freeglut.h>
-
 
 
 GLfloat cubeRotateX = 45.0f;
@@ -25,6 +25,9 @@ GLvoid initGL(GLsizei, GLsizei);
 GLvoid drawScene(GLvoid);
 GLboolean checkKeys(GLvoid);
 GLvoid displayFPS(GLvoid);
+
+
+Texture *texture = NULL;
 int main(int argc, char** argv)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -73,7 +76,7 @@ int main(int argc, char** argv)
 			done = 1;
 
 		}
-		SDL_Delay(1);
+		SDL_Delay(10);
 	}
 
 	SDL_GL_DeleteContext(glContext);
@@ -98,6 +101,8 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glEnable(GL_PERSPECTIVE_CORRECTION_HINT);
+	glEnable(GL_TEXTURE_2D);
+	texture = new Texture("texture.tga", "Surface Texture");
 }
 GLvoid drawScene(GLvoid)
 {
@@ -107,44 +112,46 @@ GLvoid drawScene(GLvoid)
 	glTranslatef(0.0, 0.0, -5.0f);
 	glRotatef(cubeRotateX, 1, 0, 0);
 	glRotatef(cubeRotateY, 0, 1, 0);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBindTexture(GL_TEXTURE_2D, texture->texID);
 	//Draw Cube;
 	glBegin(GL_QUADS);
 	//top
-	glColor3f(1.0f, 0.5f, 0.0f);
-	glVertex3f(1.0, 1.0, -1.0f);
-	glVertex3f(-1.0, 1.0, -1.0f);
-	glVertex3f(-1.0, 1.0, 1.0f);
-	glVertex3f(1.0, 1.0, 1.0f);
+	
+	glTexCoord2f(2.0f, 2.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 2.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, 1.0, 1.0f);
+	glTexCoord2f(2.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
 	//bottom
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(1.0, -1.0, -1.0f);
-	glVertex3f(-1.0, -1.0, -1.0f);
-	glVertex3f(-1.0, -1.0, 1.0f);
-	glVertex3f(1.0, -1.0, 1.0f);
+	
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, -1.0, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, -1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
 	//front
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(1.0, 1.0, 1.0f);
-	glVertex3f(-1.0, 1.0, 1.0f);
-	glVertex3f(-1.0, -1.0, 1.0f);
-	glVertex3f(1.0, -1.0, 1.0f);
+	
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
 	//back
-	glColor3f(1.0f, 1.0f, 0.0f);
-	glVertex3f(1.0, 1.0, -1.0f);
-	glVertex3f(-1.0, 1.0, -1.0f);
-	glVertex3f(-1.0, -1.0, -1.0f);
-	glVertex3f(1.0, -1.0, -1.0f);
+	
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
 	//left
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(-1.0, 1.0, 1.0f);
-	glVertex3f(-1.0, 1.0, -1.0f);
-	glVertex3f(-1.0, -1.0, -1.0f);
-	glVertex3f(-1.0, -1.0, 1.0f);
+	
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
 	//right
-	glColor3f(1.0f, 0.0f, 1.0f);
-	glVertex3f(1.0, 1.0, 1.0f);
-	glVertex3f(1.0, 1.0, -1.0f);
-	glVertex3f(1.0, -1.0, -1.0f);
-	glVertex3f(1.0, -1.0, 1.0f);
+	
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
 	glEnd();
 
 
@@ -157,7 +164,7 @@ GLboolean checkKeys(GLvoid)
 {
 	static long lastTime = SDL_GetTicks();
 	const GLfloat speed = 1.0f;
-	const long updateTime = 100;
+	const long updateTime = 10;
 	if (keys[SDL_GetScancodeFromKey(SDLK_ESCAPE)])
 	{
 		return true;
