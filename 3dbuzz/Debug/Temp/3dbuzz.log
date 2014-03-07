@@ -1,14 +1,22 @@
-﻿Build started 3/6/2014 11:36:35 PM.
+﻿Build started 3/7/2014 10:03:38 PM.
      1>Project "C:\Users\Gabriel\Desktop\GL\3dbuzz\3dbuzz.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\freeglut\include\GL /I"C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\SDL2-2.0.1\include" /IC:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\glew\include\GL /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\Temp\\" /Fd"Debug\Temp\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt SDL_Demo.cpp
          SDL_Demo.cpp
+     1>c:\users\gabriel\desktop\gl\3dbuzz\sdl_demo.cpp(261): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\gabriel\desktop\gl\3dbuzz\sdl_demo.cpp(265): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\gabriel\desktop\gl\3dbuzz\sdl_demo.cpp(277): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\gabriel\desktop\gl\3dbuzz\sdl_demo.cpp(281): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\gabriel\desktop\gl\3dbuzz\sdl_demo.cpp(285): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
+     1>c:\users\gabriel\desktop\gl\3dbuzz\sdl_demo.cpp(289): warning C4305: 'argument' : truncation from 'double' to 'GLfloat'
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\SDL2-2.0.1\lib\x86" /LIBPATH:C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\freeglut\lib /LIBPATH:C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\glew\lib\Release\Win32 glew32.lib glew32s.lib SDL2.lib SDL2main.lib SDL2test.lib freeglut.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.lib" /MACHINE:X86 Debug\Temp\SDL_Demo.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\SDL2-2.0.1\lib\x86" /LIBPATH:C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\freeglut\lib /LIBPATH:C:\Users\Gabriel\Desktop\GL\3dbuzz\..\Libraries\glew\lib\Release\Win32 glew32.lib glew32s.lib SDL2.lib SDL2main.lib SDL2test.lib freeglut.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.lib" /MACHINE:X86 Debug\Temp\Camera.obj
+         Debug\Temp\Light.obj
+         Debug\Temp\SDL_Demo.obj
          Debug\Temp\Texture.obj
          3dbuzz.vcxproj -> C:\Users\Gabriel\Desktop\GL\3dbuzz\Debug\3dbuzz.exe
      1>Done Building Project "C:\Users\Gabriel\Desktop\GL\3dbuzz\3dbuzz.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.13
+Time Elapsed 00:00:01.17

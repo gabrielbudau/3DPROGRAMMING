@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Texture.h"
+#include "Camera.h"
+#include "Light.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -26,8 +28,13 @@ GLvoid drawScene(GLvoid);
 GLboolean checkKeys(GLvoid);
 GLvoid displayFPS(GLvoid);
 
+CCamera Camera;
 
-Texture *texture = NULL;
+Texture *texture1	= NULL;
+Texture *texture2	= NULL;
+Texture *texture3	= NULL;
+Light	*light		= NULL;
+
 int main(int argc, char** argv)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -94,6 +101,7 @@ GLvoid establishProjectionMatrix(GLsizei Width, GLsizei Height)
 }
 GLvoid initGL(GLsizei _Width, GLsizei _Height)
 {
+	Light::Initialise();
 	establishProjectionMatrix(_Width, _Height);
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -102,52 +110,77 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glEnable(GL_PERSPECTIVE_CORRECTION_HINT);
 	glEnable(GL_TEXTURE_2D);
-	texture = new Texture("texture.tga", "Surface Texture");
+	glEnable(GL_LIGHTING);
+
+	light = new Light(LIGHT_SPOT);
+	light->setDiffuse(1.0, 1.0, 1.0, 1.0);
+	light->setPosition(0, 5, 0);
+	
+
+	
+	texture1 = new Texture("..\\Resources\\Textures\\stoneWall_1.tga", "Surface Texture");
+	texture2 = new Texture("..\\Resources\\Textures\\crate_1.tga", "Surface Texture");
+	texture3 = new Texture("..\\Resources\\Textures\\crate_2.tga", "Surface Texture");
+	glBindTexture(GL_TEXTURE_2D, texture3->texID);
+
+	Camera.Move(F3dVector(0.0, 0.0, 3.0));
+	Camera.MoveForward(1.0);
+
+
+
 }
 GLvoid drawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	//Camera.Render();
+
 	glTranslatef(0.0, 0.0, -5.0f);
 	glRotatef(cubeRotateX, 1, 0, 0);
 	glRotatef(cubeRotateY, 0, 1, 0);
+	for (int i = 0; i < (int)Light::lights.size(); i++)
+	{
+		Light::lights[i]->updateLight();
+	}
+
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glBindTexture(GL_TEXTURE_2D, texture->texID);
+	
 	//Draw Cube;
 	glBegin(GL_QUADS);
 	//top
-	
-	glTexCoord2f(2.0f, 2.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 2.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glNormal3f(0, 1, 0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(2.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
 	//bottom
-	
+	glNormal3f(0, -1, 0);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, -1.0, -1.0f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, -1.0, -1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
 	//front
-	
+	glNormal3f(0, 0, 1);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
 	//back
-	
+	glNormal3f(0, 0, -1);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
 	//left
-	
+	glNormal3f(1, 0, 0);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
 	//right
-	
+	glNormal3f(-1, 0, 0);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
@@ -189,6 +222,81 @@ GLboolean checkKeys(GLvoid)
 		{
 			cubeRotateX += speed;
 		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_1)])
+		{
+			glBindTexture(GL_TEXTURE_2D, texture1->texID);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_2)])
+		{
+			glBindTexture(GL_TEXTURE_2D, texture2->texID);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_3)])
+		{
+			glBindTexture(GL_TEXTURE_2D, texture3->texID);
+		}
+		/*
+		CAMERA movement :
+		w		: forwards
+		s		: backwards
+		a		: turn left
+		d		: turn right
+		x		: turn up
+		y		: turn down
+		v		: strafe right
+		c		: strafe left
+		r		: move up
+		f		: move down
+		m / n	: roll
+		*/
+		if (keys[SDL_GetScancodeFromKey(SDLK_a)])
+		{
+			Camera.RotateY(5.0);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_d)])
+		{
+			Camera.RotateY(-5.0);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_w)])
+		{
+			Camera.MoveForward(-0.1);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_s)])
+		{
+			Camera.MoveForward(0.1);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_x)])
+		{
+			Camera.RotateX(5.0);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_y)])
+		{
+			Camera.RotateX(-5.0);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_c)])
+		{
+			Camera.StrafeRight(-0.1);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_v)])
+		{
+			Camera.StrafeRight(0.1);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_f)])
+		{
+			Camera.MoveUpward(-0.3);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_r)])
+		{
+			Camera.MoveUpward(0.3);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_m)])
+		{
+			Camera.RotateZ(-5.0);
+		}
+		if (keys[SDL_GetScancodeFromKey(SDLK_n)])
+		{
+			Camera.RotateZ(5.0);
+		}
+
 	}
 
 	return false;
