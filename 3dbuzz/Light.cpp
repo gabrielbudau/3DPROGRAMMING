@@ -54,7 +54,7 @@ Light::~Light()
 	{
 		availableLights.push_back(lightNum);
 	}
-
+	/*
 	for (vector<Light *>::iterator it = lights.begin(); it != lights.end(); it++)
 	{
 		if ((*it) == this)
@@ -62,6 +62,8 @@ Light::~Light()
 			lights.erase(it);
 		}
 	}
+	*/
+	lights.clear();
 	
 }
 

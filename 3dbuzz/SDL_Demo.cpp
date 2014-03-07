@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "Texture.h"
 #include "Camera.h"
 #include "Light.h"
@@ -22,18 +23,19 @@ const Uint8 *keys = NULL;
 SDL_Window *screen;
 SDL_GLContext glContext;
 const unsigned char *version;
+
+CCamera		Camera;
+Texture		*texture1	= NULL;
+Texture		*texture2	= NULL;
+Texture		*texture3	= NULL;
+int			*seed		= NULL;
+
 GLvoid establishProjectionMatrix(GLsizei, GLsizei);
 GLvoid initGL(GLsizei, GLsizei);
 GLvoid drawScene(GLvoid);
 GLboolean checkKeys(GLvoid);
 GLvoid displayFPS(GLvoid);
-
-CCamera Camera;
-
-Texture *texture1	= NULL;
-Texture *texture2	= NULL;
-Texture *texture3	= NULL;
-Light	*light		= NULL;
+GLvoid drawGrid(GLvoid);
 
 int main(int argc, char** argv)
 {
@@ -60,6 +62,25 @@ int main(int argc, char** argv)
 	SDL_GL_MakeCurrent(screen, glContext);
 
 	initGL(windowWidth, windowHeight);
+
+	seed = new int[Light::numLights];
+	for (int i = 0; i < Light::numLights; i++)
+	{
+		Light *light = new Light(LIGHT_SPOT);
+
+		float r = (float)rand() / (float)RAND_MAX;
+		float g = (float)rand() / (float)RAND_MAX;
+		float b = (float)rand() / (float)RAND_MAX;
+		light->setDiffuse(r, g, b, 1.0);
+		light->setAmbient(0, 0, 0, 1);
+		light->setSpotDirection(0, -1, 0);
+
+		float cutoff = 20.0f + ((float)rand() / (float)RAND_MAX*60.0f);
+
+		light->setCutOff(cutoff);
+		light->setExponent(20.0 * cutoff);
+		seed[i] = rand();
+	}
 	int done = 0;
 
 	while (!done)
@@ -83,9 +104,14 @@ int main(int argc, char** argv)
 			done = 1;
 
 		}
-		SDL_Delay(10);
+		//SDL_Delay(1);
 	}
 
+	for (int i = 0; i < (int)Light::lights.size(); i ++)
+	{
+		delete Light::lights[i];
+	}
+	delete[] seed;
 	SDL_GL_DeleteContext(glContext);
 	SDL_Quit();
 	return 1;
@@ -109,13 +135,8 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glEnable(GL_PERSPECTIVE_CORRECTION_HINT);
-	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
-
-	light = new Light(LIGHT_SPOT);
-	light->setDiffuse(1.0, 1.0, 1.0, 1.0);
-	light->setPosition(0, 5, 0);
-	
 
 	
 	texture1 = new Texture("..\\Resources\\Textures\\stoneWall_1.tga", "Surface Texture");
@@ -123,8 +144,8 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	texture3 = new Texture("..\\Resources\\Textures\\crate_2.tga", "Surface Texture");
 	glBindTexture(GL_TEXTURE_2D, texture3->texID);
 
-	Camera.Move(F3dVector(0.0, 0.0, 3.0));
-	Camera.MoveForward(1.0);
+	//Camera.Move(F3dVector(0.0, 0.0, 3.0));
+	//Camera.MoveForward(1.0);
 
 
 
@@ -135,58 +156,22 @@ GLvoid drawScene(GLvoid)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//Camera.Render();
+	Camera.Render();
 
-	glTranslatef(0.0, 0.0, -5.0f);
+	glTranslatef(0.0, 0.0, -80.0f);
 	glRotatef(cubeRotateX, 1, 0, 0);
 	glRotatef(cubeRotateY, 0, 1, 0);
+	
 	for (int i = 0; i < (int)Light::lights.size(); i++)
 	{
+		double randomNumber = (double)SDL_GetTicks() + seed[i];
+		float randX = (float)sin(randomNumber / 1600.0f) * (float)cos(randomNumber / 1200.0f) * 50.0f;
+		float randY = (float)sin(randomNumber / 900.0f) * (float)cos(randomNumber / 1400.0f) * 50.0f;
+		Light::lights[i]->setPosition(randX, 30.0f, randY);
 		Light::lights[i]->updateLight();
 	}
-
-	glColor3f(1.0f, 1.0f, 1.0f);
 	
-	//Draw Cube;
-	glBegin(GL_QUADS);
-	//top
-	glNormal3f(0, 1, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
-	//bottom
-	glNormal3f(0, -1, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, -1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	//front
-	glNormal3f(0, 0, 1);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	//back
-	glNormal3f(0, 0, -1);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
-	//left
-	glNormal3f(1, 0, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	//right
-	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	glEnd();
-
+	drawGrid();
 
 	glFlush();
 	//this line is modified in other window interfaces
@@ -319,4 +304,28 @@ GLvoid displayFPS(GLvoid)
 		loops = 0;
 	}
 	loops++;
+}
+GLvoid drawGrid(GLvoid)
+{
+	const float w = 80.0f;
+	const float h = 80.0f;
+	const int divisions = 100;
+
+	float incX = w / (float)divisions;
+	float incY = h / (float)divisions;
+	glColor3f(0, 0, 0);
+	glNormal3f(0, 1, 0);
+	
+	for (float x = -w/2; x < w/2; x+= incX)
+	{
+		for (float y = -h / 2; y < h / 2; y += incY)
+		{
+			glBegin(GL_TRIANGLE_STRIP);
+			glVertex3f(x + incX,	0, y + incY);
+			glVertex3f(x,			0, y + incY);
+			glVertex3f(x + incX,	0, y);
+			glVertex3f(x,			0, y);
+			glEnd();
+		}
+	}
 }
