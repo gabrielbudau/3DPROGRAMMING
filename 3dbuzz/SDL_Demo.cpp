@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "GLEngine.h"
+#include "Control.h"
 #include <glew.h>
 #include <freeglut.h>
 
@@ -20,10 +21,14 @@ GLvoid drawScene(GLvoid);
 GLboolean checkKeys(GLvoid);
 GLvoid displayFPS(GLvoid);
 GLvoid setOrtho(GLsizei, GLsizei);
-CCamera Camera;
+GLvoid drawControls(GLvoid);
 
+CCamera Camera;
 Texture *texture1 = NULL;
 Light	*light = NULL;
+
+Control *controlled = NULL;
+MouseState state;
 
 int main(int argc, char** argv)
 {
@@ -54,6 +59,11 @@ int main(int argc, char** argv)
 
 	while (!done)
 	{
+		SDL_GetMouseState(&state.x, &state.y);
+
+		state.LeftButtonDown = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1);
+		state.MiddleButtonDown = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(2);
+		state.RightButtonDown = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(3);
 
 		drawScene();
 		SDL_Event event;
@@ -76,13 +86,15 @@ int main(int argc, char** argv)
 		SDL_Delay(1);
 	}
 
+	for (list<Control *>::iterator it = Control::controls.begin(); it != Control::controls.end(); it++)
+	{
+		delete (*it);
+	}
 	GLEngine::Uninitialize();
 	SDL_GL_DeleteContext(glContext);
 	SDL_Quit();
 	return 1;
 }
-
-
 GLvoid establishProjectionMatrix(GLsizei Width, GLsizei Height)
 {
 	glViewport(0, 0, Width, Height);
@@ -187,7 +199,11 @@ GLvoid drawScene(GLvoid)
 	glDisable(GL_LIGHTING);
 	setOrtho(windowWidth, windowHeight);
 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	displayFPS();
+	drawControls();
 	glFlush();
 	//this line is modified in other window interfaces
 	SDL_GL_SwapWindow(screen);
@@ -313,4 +329,29 @@ GLvoid setOrtho(GLsizei w, GLsizei h)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, w, h, 0);
+}
+GLvoid drawControls(GLvoid)
+{
+	for (list<Control *>::iterator it = Control::controls.begin(); it != Control::controls.end(); it++)
+	{
+		Control *control = (*it);
+		control->drawControl();
+
+		if (controlled != NULL && controlled != control)
+			continue;
+		if (control->updateControl(state))
+		{
+			controlled = control;
+
+			// Handle events
+		}
+		else if (control == controlled)
+		{
+			controlled = NULL;
+		}
+		else
+		{
+			//Control has been updated ... but not messages 
+		}
+	}
 }
