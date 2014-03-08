@@ -1,7 +1,7 @@
 #include "GLEngine.h"
 
-const int fontSize = 8;
-const int fontSpace = 7;
+const int fontSize = 13;
+const int fontSpace = 10;
 GLEngine::GLEngine()
 {
 
@@ -36,6 +36,7 @@ GLvoid GLEngine::buildTextureFont(GLvoid)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
+	glColor4f(.0, .0, .0, 1.0);
 	for (int i = 0; i < 256; i++)
 	{
 		float cx = (float)(i % 16) / 16.0f;
@@ -80,7 +81,7 @@ GLvoid GLEngine::drawText(GLint x, GLint y, const char *_text, ...)
 }
 GLuint GLEngine::getTextWidth(const char *text)
 {
-	return (GLuint)(strlen(text)) * fontSpace;
+	return (GLuint)(strlen(text) + 1) * fontSpace;
 }
 GLuint GLEngine::getTextHeight(const char *text)
 {

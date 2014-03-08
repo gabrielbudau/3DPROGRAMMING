@@ -47,7 +47,7 @@ int Control::getHeight()
 Control*  addControl(Control* control)
 {
 	static int lastX = 5;
-	static int lastY = 5;
+	static int lastY = 25;
 	control->setPosition(lastX, lastY);
 	lastY += control->getHeight() + 5;
 

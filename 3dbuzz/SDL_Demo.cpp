@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "GLEngine.h"
-#include "Control.h"
+#include "Button.h"
 #include <glew.h>
 #include <freeglut.h>
 
@@ -89,6 +89,7 @@ int main(int argc, char** argv)
 	for (list<Control *>::iterator it = Control::controls.begin(); it != Control::controls.end(); it++)
 	{
 		delete (*it);
+		
 	}
 	GLEngine::Uninitialize();
 	SDL_GL_DeleteContext(glContext);
@@ -124,7 +125,8 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 
 	texture1 = new Texture("..\\Resources\\Textures\\stoneWall_1.tga", "Surface Texture");
 	
-
+	addControl(new Button("Run away!", 0, 0, 200, 50));
+	addControl(new Button("Hit me!", 250, 5, 200, 50));
 	Camera.Move(F3dVector(0.0, 0.0, 3.0));
 	Camera.MoveForward(1.0);
 
