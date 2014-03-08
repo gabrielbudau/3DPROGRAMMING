@@ -1,15 +1,7 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "Texture.h"
-#include "Camera.h"
-#include "Light.h"
-
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#endif
-
+#include "GLEngine.h"
 #include <glew.h>
 #include <freeglut.h>
 
@@ -22,20 +14,16 @@ const Uint8 *keys = NULL;
 SDL_Window *screen;
 SDL_GLContext glContext;
 const unsigned char *version;
-
-CCamera Camera;
-Texture *texture1 = NULL;
-Texture *texture2 = NULL;
-Texture *texture3 = NULL;
-Light	*light = NULL;
-GLuint gridList = 0;
-
 GLvoid establishProjectionMatrix(GLsizei, GLsizei);
 GLvoid initGL(GLsizei, GLsizei);
 GLvoid drawScene(GLvoid);
 GLboolean checkKeys(GLvoid);
 GLvoid displayFPS(GLvoid);
-GLvoid drawCube(GLvoid);
+GLvoid setOrtho(GLsizei, GLsizei);
+CCamera Camera;
+
+Texture *texture1 = NULL;
+Light	*light = NULL;
 
 int main(int argc, char** argv)
 {
@@ -85,9 +73,10 @@ int main(int argc, char** argv)
 			done = 1;
 
 		}
-		SDL_Delay(10);
+		SDL_Delay(1);
 	}
 
+	GLEngine::Uninitialize();
 	SDL_GL_DeleteContext(glContext);
 	SDL_Quit();
 	return 1;
@@ -103,7 +92,8 @@ GLvoid establishProjectionMatrix(GLsizei Width, GLsizei Height)
 }
 GLvoid initGL(GLsizei _Width, GLsizei _Height)
 {
-	Light::Initialise();
+	iGLEngine->initialize(_Width, _Height);
+
 	establishProjectionMatrix(_Width, _Height);
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -112,18 +102,16 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glEnable(GL_PERSPECTIVE_CORRECTION_HINT);
 	glEnable(GL_TEXTURE_2D);
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 
 	light = new Light(LIGHT_SPOT);
 	light->setDiffuse(2.0, 2.0, 2.0, 1.0);
-	light->setPosition(0, 60, 0);
+	light->setPosition(0, 15, 0);
 
 
 
 	texture1 = new Texture("..\\Resources\\Textures\\stoneWall_1.tga", "Surface Texture");
-	texture2 = new Texture("..\\Resources\\Textures\\crate_1.tga", "Surface Texture");
-	texture3 = new Texture("..\\Resources\\Textures\\crate_2.tga", "Surface Texture");
-	glBindTexture(GL_TEXTURE_2D, texture3->texID);
+	
 
 	Camera.Move(F3dVector(0.0, 0.0, 3.0));
 	Camera.MoveForward(1.0);
@@ -134,12 +122,18 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 GLvoid drawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//PASS 1- persp
+	glBindTexture(GL_TEXTURE_2D, texture1->texID);
+	establishProjectionMatrix(windowWidth, windowHeight);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glEnable(GL_LIGHTING);
+	//Camera.Render();
 
-	Camera.Render();
+	glDisable(GL_BLEND);
 
-	glTranslatef(0.0, 0.0, -60.0f);
+	glTranslatef(0.0, 0.0, -5.0f);
 	glRotatef(cubeRotateX, 1, 0, 0);
 	glRotatef(cubeRotateY, 0, 1, 0);
 	for (int i = 0; i < (int)Light::lights.size(); i++)
@@ -149,35 +143,54 @@ GLvoid drawScene(GLvoid)
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	if (gridList == 0)
-	{
-		gridList = glGenLists(1);
-		glNewList(gridList, GL_COMPILE_AND_EXECUTE);
+	//Draw Cube;
+	glBegin(GL_QUADS);
+	//top
+	glNormal3f(0, 1, 0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, 1.0, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
+	//bottom
+	glNormal3f(0, -1, 0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, -1.0, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, -1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
+	//front
+	glNormal3f(0, 0, 1);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
+	//back
+	glNormal3f(0, 0, -1);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
+	//left
+	glNormal3f(1, 0, 0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
+	//right
+	glNormal3f(-1, 0, 0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
+	glEnd();
 
+	//PASS 2 - ortho
+	glDisable(GL_LIGHTING);
+	setOrtho(windowWidth, windowHeight);
 
-		for (GLfloat x = -20.0f; x < 20.0f; x += 2.5f)
-		{
-			for (GLfloat y = -20.0f; y < 20.0f; y += 2.5f){
-				glMatrixMode(GL_MODELVIEW);
-				glPushMatrix();
-
-				glTranslated(x, y, 0.0f);
-				drawCube();
-
-				glPopMatrix();
-			}
-		}
-		glEndList();
-	}
-	else{
-		glCallList(gridList);
-	}
-
-
+	displayFPS();
 	glFlush();
 	//this line is modified in other window interfaces
 	SDL_GL_SwapWindow(screen);
-	displayFPS();
 }
 GLboolean checkKeys(GLvoid)
 {
@@ -207,18 +220,6 @@ GLboolean checkKeys(GLvoid)
 		if (keys[SDL_GetScancodeFromKey(SDLK_DOWN)])
 		{
 			cubeRotateX += speed;
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_1)])
-		{
-			glBindTexture(GL_TEXTURE_2D, texture1->texID);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_2)])
-		{
-			glBindTexture(GL_TEXTURE_2D, texture2->texID);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_3)])
-		{
-			glBindTexture(GL_TEXTURE_2D, texture3->texID);
 		}
 		/*
 		CAMERA movement :
@@ -298,53 +299,18 @@ GLvoid displayFPS(GLvoid)
 	{
 		GLfloat newFPS = (GLfloat)loops / (GLfloat)(newtime - lastTime) * 1000.0f;
 		FPS = (FPS + newFPS) / 2.0f;
-		char title[80];
-		sprintf_s(title, "OpenGL Demo - %.2f", FPS);
-		SDL_SetWindowTitle(screen, title);
 		lastTime = newtime;
 		loops = 0;
 	}
+
+	iGLEngine->drawText(5, 5, "FPS: - %.2f\n ", FPS);
+
 	loops++;
 }
-GLvoid drawCube(GLvoid)
+GLvoid setOrtho(GLsizei w, GLsizei h)
 {
-	//Draw Cube;
-	glBegin(GL_QUADS);
-	//top
-	glNormal3f(0, 1, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
-	//bottom
-	glNormal3f(0, -1, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, -1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	//front
-	glNormal3f(0, 0, 1);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	//back
-	glNormal3f(0, 0, -1);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
-	//left
-	glNormal3f(1, 0, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	//right
-	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	glEnd();
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, w, h, 0);
 }

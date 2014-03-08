@@ -83,12 +83,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="GLEngine.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="SDL_Demo.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="GLEngine.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
