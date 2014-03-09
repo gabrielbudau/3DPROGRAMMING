@@ -24,7 +24,7 @@ GLvoid GLEngine::initialize(GLint width, GLint height)
 {
 	Light::Initialise();
 
-	fontTexture = new Texture("..\\Resources\\Textures\\font.tga", "Font Texture");
+	fontTexture = new Texture("..\\Resources\\Textures\\font_3.tga", "Font Texture");
 	buildTextureFont();
 }
 GLvoid GLEngine::buildTextureFont(GLvoid)

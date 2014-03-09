@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "GLEngine.h"
 #include "Button.h"
+#include "ListBox.h"
 #include <glew.h>
 #include <freeglut.h>
 
@@ -126,7 +127,12 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	texture1 = new Texture("..\\Resources\\Textures\\stoneWall_1.tga", "Surface Texture");
 	
 	addControl(new Button("Run away!", 0, 0, 200, 50));
-	addControl(new Button("Hit me!", 250, 5, 200, 50));
+	ListBox *lstBox = (ListBox*)addControl(new ListBox(0, 0, 200, 200));
+	lstBox->addItem("Buzz");
+	lstBox->addItem("Joel");
+	lstBox->addItem("Logan");
+	lstBox->addItem("Angela");
+
 	Camera.Move(F3dVector(0.0, 0.0, 3.0));
 	Camera.MoveForward(1.0);
 
