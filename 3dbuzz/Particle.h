@@ -9,7 +9,7 @@ class Particle
 public:
 	Particle(int id);
 	void Update(long time);
-
+	void Rotation(float angle, float &x, float &y);
 public:
 	long lastTime;
 	int id;

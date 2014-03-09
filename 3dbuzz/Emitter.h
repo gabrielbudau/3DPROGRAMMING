@@ -4,6 +4,8 @@
 #include"Particle.h"
 
 using std::list;
+using std::vector;
+
 class Emitter
 {
 public:
@@ -15,7 +17,7 @@ protected:
 	void addParticle(void);
 	float fRand(float start = 0.0f, float end = 1.0f);
 public:
-	list<Particle *>		particles;
+	vector<Particle *>		particles;
 
 	Texture					*texture;
 

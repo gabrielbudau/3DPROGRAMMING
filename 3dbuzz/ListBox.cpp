@@ -15,12 +15,12 @@ void	ListBox::addItem(string item)
 {
 	items.push_back(item);
 }
-void	ListBox::removeItem(int index)
+void	ListBox::removeItem(int deleteIndex)
 {
 	int i = 0;
 	for (vector<string>::iterator it = items.begin(); it != items.end(); i++)
 	{
-		if (i == index)
+		if (i == deleteIndex)
 		{
 			items.erase(it);
 			break;

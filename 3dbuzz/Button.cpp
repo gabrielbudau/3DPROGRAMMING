@@ -78,3 +78,8 @@ string	Button::getType(void)
 {
 	return "button";
 }
+
+string Button::getLabel(void)
+{
+	return label;
+}

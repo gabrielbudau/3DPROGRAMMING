@@ -12,14 +12,14 @@
 
 GLfloat rotateX = 45.0f;
 GLfloat rotateY = 45.0f;
-GLfloat zoom = -5.0f;
+GLfloat zoom = -100.0f;
 
 const float rotateXSpeed = 0.5f;
 const float rotateYSpeed = 0.5f;
 const float zoomSpeed = 0.01f;
 
-const GLsizei windowWidth = 1000;
-const GLsizei windowHeight = 1000;
+const GLsizei windowWidth = 800;
+const GLsizei windowHeight = 650;
 const Uint8 *keys = NULL;
 SDL_Window *screen;
 SDL_GLContext glContext;
@@ -32,16 +32,35 @@ GLboolean updateNavigation(GLvoid);
 GLvoid displayFPS(GLvoid);
 GLvoid setOrtho(GLsizei, GLsizei);
 GLvoid drawControls(GLvoid);
-
-CCamera Camera;
-Texture *texture1 = NULL;
+GLvoid drawGrid(GLvoid);
+GLvoid updateControls(GLvoid);
+GLvoid initializeControls();
+GLvoid handleEvent(Control *control);
 Light	*light = NULL;
-
-
 bool navigating = false;
 Control *controlled = NULL;
 MouseState state;
-float testValue = 3.0f;
+
+vector<Texture *>textureList;
+vector<Emitter *>emitterList;
+
+ListBox *lstTextures		= NULL;
+ListBox *lstEmitters		= NULL;
+
+Slider *slidLife			= NULL;
+Slider *slidLifeRange		= NULL;
+Slider *slidSize			= NULL;
+Slider *slidSizeRange		= NULL;
+Slider *slidSpread			= NULL;
+Slider *slidSaturation		= NULL;
+Slider *slidEmissionRadius	= NULL;
+Slider *slidEmissionRate	= NULL;
+Slider *slidGravity			= NULL;
+Slider *slidOffsetX			= NULL;
+Slider *slidOffsetY			= NULL;
+Slider *slidOffsetZ			= NULL;
+Slider *slidVortex			= NULL;
+Slider *slidAlpha			= NULL;
 
 int main(int argc, char** argv)
 {
@@ -50,7 +69,7 @@ int main(int argc, char** argv)
 		fprintf_s(stderr, "Unable to initialize SDL:  %s", SDL_GetError());
 		exit(1);
 	}
-	if ((screen = SDL_CreateWindow("My Game Window", 10, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_SWSURFACE | SDL_WINDOW_OPENGL)) == NULL)
+	if ((screen = SDL_CreateWindow("My Game Window", 10, 50, windowWidth, windowHeight, SDL_SWSURFACE | SDL_WINDOW_OPENGL)) == NULL)
 	{
 		fprintf_s(stderr, "Unable to create window:  %s", SDL_GetError());
 		exit(2);
@@ -96,7 +115,7 @@ int main(int argc, char** argv)
 			done = 1;
 
 		}
-		SDL_Delay(1);
+		//SDL_Delay(1);
 	}
 
 	for (list<Control *>::iterator it = Control::controls.begin(); it != Control::controls.end(); it++)
@@ -131,24 +150,10 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	glEnable(GL_LIGHTING);
 
 	light = new Light(LIGHT_SPOT);
-	light->setDiffuse(2.0, 2.0, 2.0, 1.0);
-	light->setPosition(0, 15, 0);
+	light->setDiffuse(1.0, 1.0, 1.0, 1.0);
+	light->setPosition(0, 50, 0);
 
-
-
-	texture1 = new Texture("..\\Resources\\Textures\\stoneWall_1.tga", "Surface Texture");
-	
-	addControl(new Button("Run away!", 0, 0, 200, 50));
-	ListBox *lstBox = (ListBox*)addControl(new ListBox(0, 0, 200, 200));
-
-	lstBox->addItem("Buzz");
-	lstBox->addItem("Joel");
-	lstBox->addItem("Logan");
-	lstBox->addItem("Angela");
-
-	Slider *testSlider = (Slider*)addControl(new Slider("Test Value", -5.0f, 5.0f, 0, 0, 300, 50));
-
-	testSlider->setValue(&testValue);
+	initializeControls();
 
 }
 GLvoid drawScene(GLvoid)
@@ -156,15 +161,14 @@ GLvoid drawScene(GLvoid)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//PASS 1- persp
-	glBindTexture(GL_TEXTURE_2D, texture1->texID);
+	
 	establishProjectionMatrix(windowWidth, windowHeight);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glEnable(GL_LIGHTING);
-	//Camera.Render();
-
+	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glTranslatef(0.0, 0.0, zoom);
 	glRotatef(rotateX, 1, 0, 0);
 	glRotatef(rotateY, 0, 1, 0);
@@ -173,50 +177,20 @@ GLvoid drawScene(GLvoid)
 		Light::lights[i]->updateLight();
 	}
 
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-	//Draw Cube;
-	glBegin(GL_QUADS);
-	//top
-	glNormal3f(0, 1, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, 1.0, 1.0f);
-	//bottom
-	glNormal3f(0, -1, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, -1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	//front
-	glNormal3f(0, 0, 1);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	//back
-	glNormal3f(0, 0, -1);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
-	//left
-	glNormal3f(1, 0, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0, -1.0, 1.0f);
-	//right
-	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0, 1.0, 1.0f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.0, 1.0, -1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0, -1.0, -1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0, -1.0, 1.0f);
-	glEnd();
+	glEnable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	drawGrid();
+	glEnable(GL_BLEND);
+	
+	for (int i = 0; i < (int)emitterList.size(); i++)
+	{
+		emitterList[i]->Update(SDL_GetTicks());
+	}
 
 	//PASS 2 - ortho
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glDisable(GL_LIGHTING);
+	glDisable(GL_BLEND);
 	setOrtho(windowWidth, windowHeight);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -249,6 +223,9 @@ GLboolean updateNavigation(GLvoid)
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 		rotateX -= (float)changeY * rotateXSpeed;
 		rotateY -= (float)changeX * rotateYSpeed;
+
+		if (rotateX < 0.0f)
+			rotateX = 1.0f;
 
 		navigating = true;
 	}
@@ -286,7 +263,7 @@ GLvoid displayFPS(GLvoid)
 		loops = 0;
 	}
 
-	iGLEngine->drawText(5, 5, "FPS: - %.2f\n ", FPS);
+	iGLEngine->drawText(205, 5, "fps:%.2f\n ", FPS);
 
 	loops++;
 }
@@ -310,7 +287,7 @@ GLvoid drawControls(GLvoid)
 		{
 			controlled = control;
 
-			// Handle events
+			handleEvent(control);
 		}
 		else if (control == controlled)
 		{
@@ -320,5 +297,146 @@ GLvoid drawControls(GLvoid)
 		{
 			//Control has been updated ... but not messages 
 		}
+	}
+}
+GLvoid drawGrid(GLvoid)
+{
+	const float w = 40.0f;
+	const float h = 40.0f;
+	const int divisions = 50;
+
+	float incX = w / (float)divisions;
+	float incY = h / (float)divisions;
+	glColor4f(0, 0, 0, 1);
+	glNormal3f(0, 1, 0);
+
+	for (float x = -w / 2; x < w / 2; x += incX)
+	{
+		for (float y = -h / 2; y < h / 2; y += incY)
+		{
+			glBegin(GL_TRIANGLE_STRIP);
+			glVertex3f(x + incX, 0, y + incY);
+			glVertex3f(x, 0, y + incY);
+			glVertex3f(x + incX, 0, y);
+			glVertex3f(x, 0, y);
+			glEnd();
+		}
+	}
+}
+GLvoid updateControls(GLvoid)
+{
+	int currentEmitter = lstEmitters->getIndex();
+	slidLife->setValue(&emitterList[currentEmitter]->life);
+	slidLifeRange->setValue(&emitterList[currentEmitter]->lifeRange);
+	slidSize->setValue(&emitterList[currentEmitter]->size);
+	slidSizeRange->setValue(&emitterList[currentEmitter]->sizeRange);
+	slidSpread->setValue(&emitterList[currentEmitter]->spread);
+	slidSaturation->setValue(&emitterList[currentEmitter]->saturation);
+	slidEmissionRadius->setValue(&emitterList[currentEmitter]->emissionRadius);
+	slidEmissionRate->setValue(&emitterList[currentEmitter]->emissionRate);
+	slidGravity->setValue(&emitterList[currentEmitter]->gravity);
+	slidOffsetX->setValue(&emitterList[currentEmitter]->position.x);
+	slidOffsetY->setValue(&emitterList[currentEmitter]->position.y);
+	slidOffsetZ->setValue(&emitterList[currentEmitter]->position.z);
+	slidVortex->setValue(&emitterList[currentEmitter]->rotation.y);
+	slidAlpha->setValue(&emitterList[currentEmitter]->alpha);
+}
+GLvoid initializeControls()
+{
+	textureList.push_back(new Texture("..\\Resources\\Textures\\fire_2.tga", "Star"));
+	textureList.push_back(new Texture("..\\Resources\\Textures\\flare.tga", "Flare"));
+	textureList.push_back(new Texture("..\\Resources\\Textures\\fire_2.tga", "Fire"));
+	textureList.push_back(new Texture("..\\Resources\\Textures\\smoke.tga", "Smoke"));
+
+	Emitter *emitter = new Emitter();
+	emitterList.push_back(emitter);
+	emitter->setTexture(textureList[0]);
+	slidLife			= (Slider*)addControl(new Slider("Life", 0.0f, 10.0f, 0, 0, 200, 20));
+	slidLifeRange		= (Slider*)addControl(new Slider("Life Range", 0.0f, 3.0f, 0, 0, 200, 20));
+	slidSize			= (Slider*)addControl(new Slider("Size", 0.0f, 10.0f, 0, 0, 200, 20));
+	slidSizeRange		= (Slider*)addControl(new Slider("Size Range", 0.0f, 5.0f, 0, 0, 200, 20));
+	slidSpread			= (Slider*)addControl(new Slider("Spread", 0.0f, 10.0f, 0, 0, 200, 20));
+	slidSaturation		= (Slider*)addControl(new Slider("Saturation", 0.0f, 1.0f, 0, 0, 200, 20));
+	slidEmissionRadius	= (Slider*)addControl(new Slider("Emission Radius", 0.0f, 10.0f, 0, 0, 200, 20));
+	slidEmissionRate	= (Slider*)addControl(new Slider("Emission rate", 0.0f, 1000.0f, 0, 0, 200, 20));
+	slidGravity			= (Slider*)addControl(new Slider("Gravity", 0.0f, 20.0f, 0, 0, 200, 20));
+	slidOffsetX			= (Slider*)addControl(new Slider("Offset X", -15.0f, 15.0f, 0, 0, 200, 20));
+	slidOffsetY			= (Slider*)addControl(new Slider("Offset Y",   0.0f, 15.0f, 0, 0, 200, 20));
+	slidOffsetZ			= (Slider*)addControl(new Slider("Offset Z", -15.0f, 15.0f, 0, 0, 200, 20));
+	slidVortex			= (Slider*)addControl(new Slider("Vortex", -50.0f, 50.0f, 0, 0, 200, 20));
+	slidAlpha			= (Slider*)addControl(new Slider("Alpha", 0.0f, 1.0f, 0, 0, 200, 20));
+
+	lstTextures = (ListBox *)addControl(new ListBox(0, 0, 200, 100));
+	for (int i = 0; i < (int)textureList.size(); i++)
+	{
+		lstTextures->addItem(textureList[i]->name);
+	}
+
+	lstEmitters = (ListBox *)addControl(new ListBox(0, 0, 200, 100));
+	for (int i = 0; i < (int)emitterList.size(); i++)
+	{
+		char text[80];
+		sprintf_s(text, "Emitter %d", i + 1);
+		lstEmitters->addItem(text);
+	}
+
+	addControl(new Button("Add", 0, 0, 100, 20));
+	addControl(new Button("Delete", 0, 0, 100, 20));
+
+	updateControls();
+}
+GLvoid handleEvent(Control *control)
+{
+	if (control->getType() == "button")
+	{
+		Button *button = (Button*)control;
+
+		if (button->getLabel() == "Add" && (int)emitterList.size() < 6)
+		{
+			Emitter *emitter = new Emitter();
+			emitterList.push_back(emitter);
+
+			emitter->setTexture(textureList[lstTextures->getIndex()]);
+
+			char text[80];
+			sprintf_s(text, "Emitter %d", (int)emitterList.size());
+			lstEmitters->addItem(text);
+
+		}
+
+		else if (button->getLabel() == "Delete" && (int)emitterList.size() > 1){
+			int i = 0;
+			vector<Emitter *>::iterator it;
+			for (it = emitterList.begin(); it != emitterList.end(); it++)
+			{
+				if (i == lstEmitters->getIndex())
+				{
+					break;
+				}
+				i++;
+			}
+			emitterList.erase(emitterList.begin() + i);
+
+			lstEmitters->removeItem(lstEmitters->getIndex());
+		}
+
+	}
+	else if (control == lstTextures)
+	{
+		Emitter *emitter = emitterList[lstEmitters->getIndex()];
+		emitter->setTexture(textureList[lstTextures->getIndex()]);
+	}
+	else if (control == lstEmitters)
+	{
+		int currentEmitter = lstEmitters->getIndex();
+		for (int i = 0; i < (int)textureList.size(); i++)
+		{
+			if (emitterList[currentEmitter]->texture == textureList[i])
+			{
+				lstTextures->setCurrent(i);
+			}
+		}
+		updateControls();
+		
 	}
 }

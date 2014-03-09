@@ -3,7 +3,7 @@
 Particle::Particle(int _id)
 {
 	id = _id;
-	totalLife = 0.0f;
+	totalLife = 1.0f;
 	life = 1.0f;
 
 	alpha = 1.0f;
@@ -15,7 +15,7 @@ Particle::Particle(int _id)
 void Particle::Update(long time)
 {
 	
-	if (!active)
+	if (active==false)
 		return;
 
 	glMatrixMode(GL_MODELVIEW);
@@ -24,7 +24,7 @@ void Particle::Update(long time)
 	if (lastTime == -1)
 		lastTime = time;
 
-	float change = (float)((time - lastTime) / 1000);
+	float change = float(time - lastTime) / 1000.0f;
 
 	velocity += acceleration * change;
 	position += velocity * change;
@@ -32,6 +32,13 @@ void Particle::Update(long time)
 	float x = position.x;
 	float y = position.y;
 	float z = position.z;
+
+	//Rotation by X
+	Rotation(rotation.x*time / 1000.0f, y, z);
+	//Rotation by Y
+	Rotation(rotation.y*time / 1000.0f, x, z);
+	//Rotation by Z
+	Rotation(rotation.z*time / 1000.0f, x, y);
 
 	if (position.y < 0.0f)
 	{
@@ -58,7 +65,8 @@ void Particle::Update(long time)
 
 	float modelView[16];
 
-	glGetFloatv(GL_MODELVIEW, modelView);
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelView);
+
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
@@ -74,8 +82,12 @@ void Particle::Update(long time)
 	}
 
 	glLoadMatrixf(modelView);
+	if (id % 5 == 0)
+		glRotatef(life * 100.f, 0, 0, 1);
+	else
+		glRotatef(life * -100.f, 0, 0, 1);
 
-
+	//glNormal3f(0, 0, 1);
 	glBegin(GL_TRIANGLE_STRIP);
 	glTexCoord2f(1, 1); glVertex3f(size, size, 0);
 	glTexCoord2f(0, 1); glVertex3f(-size, size, 0);
@@ -90,4 +102,11 @@ void Particle::Update(long time)
 	lastTime = time;
 
 	glPopMatrix();
+}
+void Particle::Rotation(float angle, float &x, float &y)
+{
+	float finalX = x * cos(angle) - y*sin(angle);
+	float finalY = y * cos(angle) + x*sin(angle);
+	x = finalX;
+	y = finalY;
 }

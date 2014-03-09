@@ -12,7 +12,7 @@ public:
 	virtual bool updateControl(MouseState &state);
 	virtual void drawControl(void);
 	virtual string getType(void);
-
+	string getLabel(void);
 protected:
 	bool down;
 	string label;

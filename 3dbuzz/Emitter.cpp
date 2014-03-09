@@ -4,6 +4,7 @@ Emitter::Emitter()
 {
 	lastTime = -1;
 	texture = NULL;
+
 	emissionRate = 30.0f;
 	emissionRadius = 0.0f;
 
@@ -18,20 +19,26 @@ Emitter::Emitter()
 	
 	spread = 1.0f;
 	gravity = 0.0f;
+
+	
 }
 Emitter::~Emitter()
 {
-	for (list<Particle *>::iterator it = particles.begin(); it != particles.end(); it++)
+	for (vector<Particle *>::iterator it = particles.begin(); it != particles.end(); it++)
 	{
 		delete (*it);
 	}
 }
 void Emitter::Update(long time)
 {
-	if (!texture)
+	if (texture == NULL)
+	{
 		return;
+	}
 	if (lastTime == -1)
+	{
 		lastTime = time;
+	}
 
 	int numEmission = (int)((float)(time - lastTime) / 1000.0f * emissionRate);
 
@@ -52,10 +59,10 @@ void Emitter::Update(long time)
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture->texID);
 
-	Particle *particle = NULL;
-	for (list<Particle *>::iterator it = particles.begin(); it != particles.end(); it++)
+	
+	for (int i = 0; i < particles.size(); i ++)
 	{
-		particle = (*it);
+		Particle *particle = particles[i];
 
 		particle->acceleration.y = -gravity;
 		particle->acceleration += wind;
@@ -67,9 +74,9 @@ void Emitter::Update(long time)
 		if (particle->active == false)
 		{
 			delete particle;
-
-			list <Particle *> ::iterator pTemp = it--;
-			particles.erase(pTemp);
+			std::vector<Particle*>::iterator it = particles.begin();
+			std::advance(it, i--);
+			particles.erase(it);
 		}
 	}
 	glMatrixMode(GL_MODELVIEW);
@@ -104,5 +111,6 @@ void Emitter::addParticle(void)
 }
 float Emitter::fRand(float start, float end)
 {
-	return start + (end - start)*((float)rand() / (float)RAND_MAX);
+	float num = (float)rand() / (float)RAND_MAX;
+	return (start + (end - start)*num);
 }
