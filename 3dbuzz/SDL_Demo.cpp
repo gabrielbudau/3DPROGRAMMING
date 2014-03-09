@@ -5,6 +5,7 @@
 #include "Button.h"
 #include "ListBox.h"
 #include "Slider.h"
+#include "Emitter.h"
 #include <glew.h>
 #include <freeglut.h>
 
@@ -49,7 +50,7 @@ int main(int argc, char** argv)
 		fprintf_s(stderr, "Unable to initialize SDL:  %s", SDL_GetError());
 		exit(1);
 	}
-	if ((screen = SDL_CreateWindow("My Game Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_SWSURFACE | SDL_WINDOW_OPENGL)) == NULL)
+	if ((screen = SDL_CreateWindow("My Game Window", 10, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_SWSURFACE | SDL_WINDOW_OPENGL)) == NULL)
 	{
 		fprintf_s(stderr, "Unable to create window:  %s", SDL_GetError());
 		exit(2);

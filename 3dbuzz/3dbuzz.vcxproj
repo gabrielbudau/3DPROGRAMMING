@@ -85,9 +85,11 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Control.cpp" />
+    <ClCompile Include="Emitter.cpp" />
     <ClCompile Include="GLEngine.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="ListBox.cpp" />
+    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="SDL_Demo.cpp" />
     <ClCompile Include="Slider.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -96,11 +98,14 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Control.h" />
+    <ClInclude Include="Emitter.h" />
     <ClInclude Include="GLEngine.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="ListBox.h" />
+    <ClInclude Include="Particle.h" />
     <ClInclude Include="Slider.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
