@@ -9,18 +9,25 @@
 #include <freeglut.h>
 
 
-GLfloat cubeRotateX = 45.0f;
-GLfloat cubeRotateY = 45.0f;
-const GLsizei windowWidth = 500;
-const GLsizei windowHeight = 500;
+GLfloat rotateX = 45.0f;
+GLfloat rotateY = 45.0f;
+GLfloat zoom = -5.0f;
+
+const float rotateXSpeed = 0.5f;
+const float rotateYSpeed = 0.5f;
+const float zoomSpeed = 0.01f;
+
+const GLsizei windowWidth = 1000;
+const GLsizei windowHeight = 1000;
 const Uint8 *keys = NULL;
 SDL_Window *screen;
 SDL_GLContext glContext;
 const unsigned char *version;
+
 GLvoid establishProjectionMatrix(GLsizei, GLsizei);
 GLvoid initGL(GLsizei, GLsizei);
 GLvoid drawScene(GLvoid);
-GLboolean checkKeys(GLvoid);
+GLboolean updateNavigation(GLvoid);
 GLvoid displayFPS(GLvoid);
 GLvoid setOrtho(GLsizei, GLsizei);
 GLvoid drawControls(GLvoid);
@@ -29,6 +36,8 @@ CCamera Camera;
 Texture *texture1 = NULL;
 Light	*light = NULL;
 
+
+bool navigating = false;
 Control *controlled = NULL;
 MouseState state;
 float testValue = 3.0f;
@@ -81,7 +90,7 @@ int main(int argc, char** argv)
 			keys = SDL_GetKeyboardState(NULL);
 		}
 
-		if (checkKeys())
+		if (updateNavigation())
 		{
 			done = 1;
 
@@ -155,9 +164,9 @@ GLvoid drawScene(GLvoid)
 
 	glDisable(GL_BLEND);
 
-	glTranslatef(0.0, 0.0, -5.0f);
-	glRotatef(cubeRotateX, 1, 0, 0);
-	glRotatef(cubeRotateY, 0, 1, 0);
+	glTranslatef(0.0, 0.0, zoom);
+	glRotatef(rotateX, 1, 0, 0);
+	glRotatef(rotateY, 0, 1, 0);
 	for (int i = 0; i < (int)Light::lights.size(); i++)
 	{
 		Light::lights[i]->updateLight();
@@ -218,98 +227,45 @@ GLvoid drawScene(GLvoid)
 	//this line is modified in other window interfaces
 	SDL_GL_SwapWindow(screen);
 }
-GLboolean checkKeys(GLvoid)
+GLboolean updateNavigation(GLvoid)
 {
-	static long lastTime = SDL_GetTicks();
-	const GLfloat speed = 1.0f;
-	const long updateTime = 10;
+	static int lastX = -1;
+	static int lastY = -1;
+	if (lastX == -1 && lastY == -1)
+	{
+		lastX = state.x;
+		lastY = state.y;
+	}
+
+	int changeX = lastX - state.x;
+	int changeY = lastY - state.y;
+
+	lastX = state.x;
+	lastY = state.y;
+
+	if (state.LeftButtonDown && controlled == NULL)
+	{
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		rotateX -= (float)changeY * rotateXSpeed;
+		rotateY -= (float)changeX * rotateYSpeed;
+
+		navigating = true;
+	}
+	else if (state.RightButtonDown && controlled == NULL)
+	{
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		zoom -= (float)changeX * zoomSpeed;
+
+		navigating = true;
+	}
+	else{
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+		navigating = false;
+	}
+
 	if (keys[SDL_GetScancodeFromKey(SDLK_ESCAPE)])
 	{
 		return true;
-	}
-
-	long newTime = SDL_GetTicks();
-
-	if (newTime - lastTime > updateTime){
-		if (keys[SDL_GetScancodeFromKey(SDLK_LEFT)])
-		{
-			cubeRotateY -= speed;
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_RIGHT)])
-		{
-			cubeRotateY += speed;
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_UP)])
-		{
-			cubeRotateX -= speed;
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_DOWN)])
-		{
-			cubeRotateX += speed;
-		}
-		/*
-		CAMERA movement :
-		w		: forwards
-		s		: backwards
-		a		: turn left
-		d		: turn right
-		x		: turn up
-		y		: turn down
-		v		: strafe right
-		c		: strafe left
-		r		: move up
-		f		: move down
-		m / n	: roll
-		*/
-		if (keys[SDL_GetScancodeFromKey(SDLK_a)])
-		{
-			Camera.RotateY(5.0);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_d)])
-		{
-			Camera.RotateY(-5.0);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_w)])
-		{
-			Camera.MoveForward(-0.1);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_s)])
-		{
-			Camera.MoveForward(0.1);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_x)])
-		{
-			Camera.RotateX(5.0);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_y)])
-		{
-			Camera.RotateX(-5.0);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_c)])
-		{
-			Camera.StrafeRight(-0.1);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_v)])
-		{
-			Camera.StrafeRight(0.1);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_f)])
-		{
-			Camera.MoveUpward(-0.3);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_r)])
-		{
-			Camera.MoveUpward(0.3);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_m)])
-		{
-			Camera.RotateZ(-5.0);
-		}
-		if (keys[SDL_GetScancodeFromKey(SDLK_n)])
-		{
-			Camera.RotateZ(5.0);
-		}
-
 	}
 
 	return false;
@@ -347,7 +303,7 @@ GLvoid drawControls(GLvoid)
 		Control *control = (*it);
 		control->drawControl();
 
-		if (controlled != NULL && controlled != control)
+		if ((controlled != NULL && controlled != control) || navigating)
 			continue;
 		if (control->updateControl(state))
 		{
