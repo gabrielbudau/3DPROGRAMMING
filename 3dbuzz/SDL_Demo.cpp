@@ -4,6 +4,7 @@
 #include "GLEngine.h"
 #include "Button.h"
 #include "ListBox.h"
+#include "Slider.h"
 #include <glew.h>
 #include <freeglut.h>
 
@@ -30,6 +31,7 @@ Light	*light = NULL;
 
 Control *controlled = NULL;
 MouseState state;
+float testValue = 3.0f;
 
 int main(int argc, char** argv)
 {
@@ -128,15 +130,15 @@ GLvoid initGL(GLsizei _Width, GLsizei _Height)
 	
 	addControl(new Button("Run away!", 0, 0, 200, 50));
 	ListBox *lstBox = (ListBox*)addControl(new ListBox(0, 0, 200, 200));
+
 	lstBox->addItem("Buzz");
 	lstBox->addItem("Joel");
 	lstBox->addItem("Logan");
 	lstBox->addItem("Angela");
 
-	Camera.Move(F3dVector(0.0, 0.0, 3.0));
-	Camera.MoveForward(1.0);
+	Slider *testSlider = (Slider*)addControl(new Slider("Test Value", -5.0f, 5.0f, 0, 0, 300, 50));
 
-
+	testSlider->setValue(&testValue);
 
 }
 GLvoid drawScene(GLvoid)

@@ -89,6 +89,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="ListBox.cpp" />
     <ClCompile Include="SDL_Demo.cpp" />
+    <ClCompile Include="Slider.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +99,7 @@
     <ClInclude Include="GLEngine.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="ListBox.h" />
+    <ClInclude Include="Slider.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
