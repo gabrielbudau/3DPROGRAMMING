@@ -89,6 +89,7 @@
     <ClCompile Include="GLEngine.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="ListBox.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="SDL_Demo.cpp" />
     <ClCompile Include="Slider.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="GLEngine.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="ListBox.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="Slider.h" />
     <ClInclude Include="Texture.h" />
